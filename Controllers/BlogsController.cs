@@ -87,7 +87,9 @@ namespace BlogIt.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.BlogCategories, "Id", "Id", blog.CategoryId);
+            ViewData["content"] = blog.content;
+            ViewData["CategoryNames"] = new SelectList(_context.BlogCategories, "Name", "Name");
+            ViewData["CurrentCategory"] = _context.BlogCategories.Where(c => c.Id == blog.CategoryId).Select(c => c.Name).FirstOrDefault();
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", blog.UserId);
             return View(blog);
         }
@@ -97,33 +99,34 @@ namespace BlogIt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent)
         {
             if (id != blog.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(blog);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BlogExists(blog.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                blog.Date = DateTime.Now;
+                blog.CategoryId = _context.BlogCategories.Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
+                blog.content = EditorContent;
+                _context.Update(blog);
+                await _context.SaveChangesAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BlogExists(blog.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+            
             ViewData["CategoryId"] = new SelectList(_context.BlogCategories, "Id", "Id", blog.CategoryId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", blog.UserId);
             return View(blog);

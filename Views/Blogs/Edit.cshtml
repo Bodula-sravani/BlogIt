@@ -3,14 +3,88 @@
 @{
     ViewData["Title"] = "Edit";
 }
+<link href="~/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="~/js/froala_editor.pkgd.min.js"></script>
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-<h1>Edit</h1>
+    .blog-post {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 20px;
+    }
 
-<h4>Blog</h4>
+        .blog-post label {
+            color: indianred;
+            font-weight: bold;
+        }
+
+    .btn-primary {
+        background-color: indianred;
+        border-color: indianred;
+    }
+
+        .btn-primary:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+    .fr-wrapper {
+        width: 100%;
+    }
+</style>
+<div>
+    <a asp-action="Index" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Back</a>
+</div>
+
+<h1 style="text-align:center">Edit Blog</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="row">
+                <div class="form-group col mb-4">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group col">
+                    <label for="CategoryName" class="control-label">Category:</label>
+                    <select id="CategoryName" name="CategoryName" class="form-control" asp-items="@(new SelectList(ViewBag.CategoryNames, "Value", "Text", ViewBag.CurrentCategory))"></select>
+                </div>
+                <div class="form-group col">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="content" class="control-label"></label>
+                <input asp-for="content" class="form-control" />
+                <span asp-validation-for="content" class="text-danger"></span>
+            </div>
+            <div class="form-group container-fluid mb-4" style="width: 1000.77px; height: 160.89px;">
+                <textarea name="EditorContent" "id=" myEditor">@Html.Raw(ViewBag.content)</textarea>
+                <script>
+                    var editor = new FroalaEditor('#myEditor');
+                </script>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="UserId" class="control-label"></label>
+                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+            </div>
+        </form>
+
+        @*<form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -41,13 +115,10 @@
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
-        </form>
+        </form>*@
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
