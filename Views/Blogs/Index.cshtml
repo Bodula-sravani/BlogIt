@@ -6,9 +6,9 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div>
+    <a asp-action="Create" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Upload new Blog</a>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -37,7 +37,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.content)
+                @Html.Raw(item.content)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Date)

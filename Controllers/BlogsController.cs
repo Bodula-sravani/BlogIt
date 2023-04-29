@@ -59,10 +59,11 @@ namespace BlogIt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName)
+        public async Task<IActionResult> Create([Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent)
         {
             blog.Date = DateTime.Now;
             blog.CategoryId = _context.BlogCategories .Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
+            blog.content= EditorContent;
             _context.Add(blog);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
