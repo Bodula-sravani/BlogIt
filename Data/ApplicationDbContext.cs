@@ -12,5 +12,9 @@ namespace BlogIt.Data
         }
 
         public DbSet<UserProfie> UserProfiles { get; set; }
+
+        public DbSet<BlogCategory> BlogCategories { get; set; }
+
+        public DbSet<Blog> Blogs { get; set; }
     }
 }

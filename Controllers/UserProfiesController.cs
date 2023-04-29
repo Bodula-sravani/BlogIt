@@ -9,6 +9,7 @@ using BlogIt.Data;
 using BlogIt.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Newtonsoft.Json;
 
 namespace BlogIt.Controllers
 {
@@ -35,11 +36,53 @@ namespace BlogIt.Controllers
 
             var user = await userManager.FindByIdAsync(userId);
 
-         //   var roles = await userManager.GetRolesAsync(user);
+          // Check if the user is logged in as an admin
+                if (User.IsInRole("Admin"))
+                {
+                    // Create a new HttpClient instance
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(30);
+                        // Set the base address of the API endpoint
+                        client.BaseAddress = new Uri("http://localhost:7113/api/BlogCategories");
 
-            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
-            userProfile.Email = userProfile.User.Email;
-            return View(userProfile);
+                    // Call the API endpoint and get the response
+                    //HttpResponseMessage response = client.GetAsync("GetAllCategories").Result;
+                    try
+                    {
+                        // Call the API endpoint and get the response
+                        HttpResponseMessage response = await client.GetAsync("");
+
+                        // Check if the response is successful
+                        if (response.IsSuccessStatusCode)
+                        {
+                            // Read the response content
+                            var content = await response.Content.ReadAsStringAsync();
+                            var categories = JsonConvert.DeserializeObject<List<BlogCategory>>(content);
+
+                            // Do something with the categories data
+                            return View(categories);
+                        }
+                        else
+                        {
+                            // Handle the error response
+                            return View("Error");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle the exception
+                        return View("Error");
+                    }
+                }
+                }
+            else
+            {
+                var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
+                userProfile.Email = userProfile.User.Email;
+                return View(userProfile);
+            }
+            
         }
 
         // GET: UserProfies/Details/5
