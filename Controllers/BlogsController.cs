@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BlogIt.Data;
 using BlogIt.Models;
+using Microsoft.AspNetCore.Html;
 
 namespace BlogIt.Controllers
 {
@@ -177,3 +178,25 @@ namespace BlogIt.Controllers
         }
     }
 }
+
+//To get the src url and store it in the local directory
+//// assume htmlString contains the HTML content with image
+//string imgSrc = "";
+//int startIndex = htmlString.IndexOf("<img"); // find the start index of img tag
+//if (startIndex >= 0) // if img tag exists
+//{
+//    int endIndex = htmlString.IndexOf(">", startIndex); // find the end index of img tag
+//    if (endIndex >= 0)
+//    {
+//        string imgTag = htmlString.Substring(startIndex, endIndex - startIndex + 1); // extract the img tag
+//        int srcIndex = imgTag.IndexOf("src=\""); // find the start index of src attribute
+//        if (srcIndex >= 0)
+//        {
+//            int srcEndIndex = imgTag.IndexOf("\"", srcIndex + 5); // find the end index of src attribute
+//            if (srcEndIndex >= 0)
+//            {
+//                imgSrc = imgTag.Substring(srcIndex + 5, srcEndIndex - srcIndex - 5); // extract the image URL
+//            }
+//        }
+//    }
+//}
