@@ -38,10 +38,7 @@ namespace BlogIt.Controllers
          //   var roles = await userManager.GetRolesAsync(user);
 
             var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
-            //userProfile.Name = userProfile.User.UserName;
             userProfile.Email = userProfile.User.Email;
-
-          //  var applicationDbContext = _context.UserProfiles.Include(u => u.User);
             return View(userProfile);
         }
 
@@ -63,51 +60,20 @@ namespace BlogIt.Controllers
 
             return View(userProfie);
         }
-
-        // GET: UserProfies/Create
-        public async Task<IActionResult> Create()
+        public async Task<UserProfie> SetImageAndProfile(UserProfie userProfie, IFormFile ProfilePic)
         {
-            var userId = userManager.GetUserId(this.User);
-
-            var user = await userManager.FindByIdAsync(userId);
-
-            //   var roles = await userManager.GetRolesAsync(user);
-
-            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
-
-            if (userProfile == null)
-            {
-                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
-        }
-
-        // POST: UserProfies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Description,Interests,ProfilePic,UserId")] UserProfie userProfie, IFormFile profilePic)
-        {
-
             var userId = userManager.GetUserId(this.User);
 
             var user = await userManager.FindByIdAsync(userId);
 
             var Email = await userManager.GetEmailAsync(user);
-
-
-            //   var roles = await userManager.GetRolesAsync(user);
+            //var roles = await userManager.GetRolesAsync(user);
             userProfie.UserId = userId;
             userProfie.Email = Email;
-            if (profilePic != null && profilePic.Length > 0)
+            if (ProfilePic != null && ProfilePic.Length > 0)
             {
                 // Generate a unique filename for the profile picture
-                string fileName = Path.GetFileName(profilePic.FileName);
+                string fileName = Path.GetFileName(ProfilePic.FileName);
                 string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
 
                 // Get the web root path
@@ -128,20 +94,44 @@ namespace BlogIt.Controllers
                 // Save the file to the destination path
                 using (var stream = new FileStream(destinationFilePath, FileMode.Create))
                 {
-                    await profilePic.CopyToAsync(stream);
+                    await ProfilePic.CopyToAsync(stream);
                 }
 
                 // Update the user profile object with the URL of the saved image
                 userProfie.ProfilePic = "/images/" + uniqueFileName;
             }
-            //var userProfileTemp = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
-            //userProfile.Name = userProfileTemp.User.UserName;
-            //userProfile.Email = userProfileTemp.User.Email;
+            return userProfie;
+        }
+        // GET: UserProfies/Create
+        public async Task<IActionResult> Create()
+        {
+            var userId = userManager.GetUserId(this.User);
+           var user = await userManager.FindByIdAsync(userId);
+            ////   var roles = await userManager.GetRolesAsync(user);
+            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
+
+            if (userProfile == null)
+            {
+                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        // POST: UserProfies/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Description,Interests,ProfilePic,UserId,Facebook,Twitter,Instagram,Youtube")] UserProfie userProfie, IFormFile ProfilePic)
+        {
+            userProfie = (UserProfie)SetImageAndProfile(userProfie, ProfilePic);
             _context.Add(userProfie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfie.UserId);
-            return View(userProfie);
         }
 
         // GET: UserProfies/Edit/5
@@ -158,13 +148,11 @@ namespace BlogIt.Controllers
             //   var roles = await userManager.GetRolesAsync(user);
 
             var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
-            //userProfile.Name = userProfile.User.UserName;
-            userProfile.Email = userProfile.User.Email;
-            //var userProfie = await _context.UserProfiles.FindAsync(id);
             if (userProfile == null)
             {
                 return NotFound();
             }
+            userProfile.Email = userProfile.User.Email;
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId); ;
             return View(userProfile);
         }
@@ -182,36 +170,7 @@ namespace BlogIt.Controllers
             }
             try
             {
-                if (ProfilePic != null && ProfilePic.Length > 0)
-                {
-                    // Generate a unique filename for the profile picture
-                    string fileName = Path.GetFileName(ProfilePic.FileName);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
-
-                    // Get the web root path
-                    string webRootPath = _webHostEnvironment.WebRootPath;
-
-                    // Combine the web root path and the "images" folder to get the full path to the destination folder
-                    string destinationFolderPath = Path.Combine(webRootPath, "images");
-
-                    // If the destination folder doesn't exist, create it
-                    if (!Directory.Exists(destinationFolderPath))
-                    {
-                        Directory.CreateDirectory(destinationFolderPath);
-                    }
-
-                    // Combine the destination folder path and the unique filename to get the full path to the destination file
-                    string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName);
-
-                    // Save the file to the destination path
-                    using (var stream = new FileStream(destinationFilePath, FileMode.Create))
-                    {
-                        await ProfilePic.CopyToAsync(stream);
-                    }
-
-                    // Update the user profile object with the URL of the saved image
-                    userProfile.ProfilePic = "/images/" + uniqueFileName;
-                }
+                userProfile = (UserProfie)SetImageAndProfile(userProfile, ProfilePic);
                 _context.Update(userProfile);
                 await _context.SaveChangesAsync();
             }
@@ -227,8 +186,6 @@ namespace BlogIt.Controllers
                 }
             }
             return RedirectToAction(nameof(Index));
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId);
-            return View(userProfile);
         }
 
         // GET: UserProfies/Delete/5
