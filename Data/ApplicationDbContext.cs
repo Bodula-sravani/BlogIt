@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BlogIt.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogIt.Data
@@ -9,5 +10,7 @@ namespace BlogIt.Data
             : base(options)
         {
         }
+
+        public DbSet<UserProfie> UserProfiles { get; set; }
     }
 }
