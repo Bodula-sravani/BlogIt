@@ -80,9 +80,9 @@ else
                                     <img src="@userProfile.ProfilePic" class="rounded-circle mr-2" width="50" height="50">
                                 }
                                 <h5 class="mb-0">@item.User.UserName</h5>
-                                 @if(item.UserId!=ViewBag.thisUserId)
+                                 @if(item.UserId!=ViewBag.thisUserId && ( ViewBag.FollowingList == null || !ViewBag.FollowingList.Contains(item.UserId)))
                                  {
-                                     <a asp-action="Edit"  style="text-decoration:none">Follow</a>
+                                    <a asp-action="Index" asp-controller="Followers" asp-route-userId="@item.UserId" style="text-decoration:none">Follow</a>
                                  }
                             </div>
                         </div>

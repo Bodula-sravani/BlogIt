@@ -1,0 +1,37 @@
+﻿@model IEnumerable<BlogIt.Models.Follower>
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<h1>Following</h1>
+@if(!Model.Any()|| Model==null){
+    
+}
+else
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+               Id
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @ViewData[item.UserId]
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Unfollow</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+}

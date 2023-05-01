@@ -21,17 +21,18 @@ namespace BlogIt.Controllers
         }
 
         
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).OrderByDescending(b => b.Date).ToList();
             var userProfileDict = new Dictionary<string, UserProfie>();
             foreach (var blog in blogs)
             {
-                var userProfile =  _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
+                var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
                 userProfileDict[blog.UserId] = (UserProfie)userProfile;
             }
-            ViewBag.thisUserId = _userManager.GetUserId(this.User);
-
+            var userId = _userManager.GetUserId(this.User);
+            ViewBag.thisUserId = userId;
+            ViewBag.FollowingList =  _context.Followers.Include(f => f.User).Where(f => f.FollowerId == userId).Select(f => f.UserId).ToList();
             ViewBag.UserProfiles = userProfileDict;
             return View(blogs);
         }
