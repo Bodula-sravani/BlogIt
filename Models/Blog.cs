@@ -24,6 +24,9 @@ namespace BlogIt.Models
         public int  CategoryId { get; set; }
         public BlogCategory BlogCategory { get; set; }
 
-
+        public static explicit operator Blog(Task<Blog> v)
+        {
+            return v.Result;
+        }
     }
 }

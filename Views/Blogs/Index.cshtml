@@ -1,62 +1,4 @@
-﻿@*@model IEnumerable<BlogIt.Models.Blog>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<div>
-    <a asp-action="Create" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Upload new Blog</a>
-</div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BlogCategory)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.Raw(item.content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BlogCategory.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>*@
+﻿
 @model IEnumerable<BlogIt.Models.Blog>
 
 @{
@@ -68,6 +10,10 @@
     }
 
 </style>
+
+<div>
+    <a asp-action="Create" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Upload new Blog</a>
+</div>
 <div class="container">
     <h1 class="text-center">Blog List</h1>
     <hr />
@@ -93,14 +39,6 @@
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Edit</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Delete</a>
                     </div>
-
-                   @* <div class="card-body">
-                        <p class="text-muted">@Html.DisplayFor(modelItem => item.Date)</p>
-                        <p class="text-muted">Category: @Html.DisplayFor(modelItem => item.BlogCategory.Name)</p>
-                        <p class="text-muted">User: @Html.DisplayFor(modelItem => item.User.UserName)</p>
-                        <hr />
-                        @Html.Raw(item.content)
-                    </div>*@
                 </div>
             </div>
         }

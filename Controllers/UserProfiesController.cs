@@ -80,6 +80,13 @@ namespace BlogIt.Controllers
             {
                 var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
                 userProfile.Email = userProfile.User.Email;
+                ViewBag.BlogListTop2 = _context.Blogs
+                                                .Include(b => b.BlogCategory)
+                                                .Include(b => b.User)
+                                                .Where(b => b.User.Id == userId)
+                                                .OrderByDescending(b => b.Date)
+                                                .Take(2);
+
                 return View(userProfile);
             }
             

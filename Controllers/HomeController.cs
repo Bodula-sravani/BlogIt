@@ -1,5 +1,7 @@
-﻿using BlogIt.Models;
+﻿using BlogIt.Data;
+using BlogIt.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace BlogIt.Controllers
@@ -7,16 +9,18 @@ namespace BlogIt.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ApplicationDbContext _context;
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         
         public IActionResult Index()
         {
-            return View();
+            var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).OrderByDescending(b => b.Date).ToList();
+            return View(blogs);
         }
 
         public IActionResult Privacy()

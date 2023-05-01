@@ -6,14 +6,28 @@
     <title>Blogger Profile</title>
     <style>
         /* Style for the main container */
-        .container {
+        /*.container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
+        }*/
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
         }
 
+        .profile {
+            width: 30%;
+
+        }
+
+        .blogs {
+            width: 200%;
+            justify-content:center
+        }
         /* Style for the profile picture */
         .profile-pic {
             display: block;
@@ -91,55 +105,85 @@
                 color: #666;
             }
 
-        img.facebook {
-            width: 40px;
-            height: 40px;
+        .label {
+            margin-right: 70px;
         }
     </style>
-</head>
-<div style="text-align: right;">
-    <div style="float: right;">
-        <div>
-            <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">Posts</a>
-        </div>
-    </div>
-</div>
-<body>
-    
-    <div class="container">
-       
-        <!-- Profile picture -->
-        <img class="profile-pic" style="height:100px;width:100px" src="@Model.ProfilePic" alt="Profile picture" />
 
-        <!-- Profile name and description -->
-        <h1 class="profile-name">@Model.Name</h1>
-        <p class="profile-desc">@Model.Interests</p>
-        <div class="profile-desc">
-            <p>@Model.Description</p>
-        </div>
-        <!-- Social media icons -->
-        <div class="social-icons">
-            @if (!string.IsNullOrEmpty(Model.Facebook))
-            {
-                <a href="@Model.Facebook"><img class="facebook" style="height:40px;width:40px" src="/images/facebook.jpg"></a>
-            }
-            @if (!string.IsNullOrEmpty(Model.Twitter))
-            {
-                <a href="@Model.Twitter"><img class="Twitter" style="height:40px;width:40px" src="/images/Twitter.png"></a>
-            }
-            @if (!string.IsNullOrEmpty(Model.Instagram))
-            {
-                <a href="@Model.Instagram"><img class="instagram" style="height:40px;width:40px" src="/images/insta.jpg"></a>
-            }
-            @if (!string.IsNullOrEmpty(Model.Youtube))
-            {
-                <a href="@Model.Youtube"><img class="YouTube" style="height:40px;width:40px" src="/images/YouTube.png"></a>
-            }
-            <div class="profile-footer">
-                <a asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
+</head>
+
+
+<body>
+    <div style="text-align: right;" class="mb-2">
+        <div style="float: right;">
+            <div>
+                <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">Posts</a>
+
             </div>
         </div>
+    </div>
+    <div class="container row" style="margin-top:10px">
+        <div class="Profile col" style="margin-top:40px">
+            <!-- Profile picture -->
+            <img class="profile-pic" style="height:100px;width:100px" src="@Model.ProfilePic" alt="Profile picture" />
+
+            <!-- Profile name and description -->
+            <h1 class="profile-name">@Model.Name</h1>
+            <p class="profile-desc">@Model.Interests</p>
+            <div class="profile-desc">
+                <p>@Model.Description</p>
+            </div>
+            <!-- Social media icons -->
+            <div class="social-icons">
+                @if (!string.IsNullOrEmpty(Model.Facebook))
+                {
+                    <a href="@Model.Facebook"><img class="facebook" style="height:40px;width:40px" src="/images/facebook.jpg"></a>
+                }
+                @if (!string.IsNullOrEmpty(Model.Twitter))
+                {
+                    <a href="@Model.Twitter"><img class="Twitter" style="height:40px;width:40px" src="/images/Twitter.png"></a>
+                }
+                @if (!string.IsNullOrEmpty(Model.Instagram))
+                {
+                    <a href="@Model.Instagram"><img class="instagram" style="height:40px;width:40px" src="/images/insta.jpg"></a>
+                }
+                @if (!string.IsNullOrEmpty(Model.Youtube))
+                {
+                    <a href="@Model.Youtube"><img class="YouTube" style="height:40px;width:40px" src="/images/YouTube.png"></a>
+                }
+                <div class="profile-footer">
+                    <a asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
+                </div>
+            </div>
         </div>
+        <div class="blogs col">
+            <div class="row">
+                @foreach (var item in ViewBag.BlogListTop2)
+                {
+                    <a href="@Url.Action("Details", "Blogs", new { id = item.Id })" style="text-decoration: none; color: inherit;">
+                        <div class="col-md-8 offset-md-2 mb-4">
+                            <div class="card" style="width: 600px; height: 300px;">
+                                <div class="card-header">
+                                    <h3 class="text-center">@item.Title</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text text-muted">
+                                        <span class="label"></span>@item.BlogCategory.Name
+                                        <span class="label"></span>@item.Date
+                                    </p>
+                                    <p class="card-text">@Html.Raw(item.content.Substring(0, 100))</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                }
+            </div>
+        </div>
+
+       </div>
+        
     </body>
 </html>
 

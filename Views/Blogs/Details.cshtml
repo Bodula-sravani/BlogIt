@@ -1,4 +1,4 @@
-﻿@model BlogIt.Models.Blog
+﻿@*@model BlogIt.Models.Blog
 
 @{
     ViewData["Title"] = "Details";
@@ -44,5 +44,32 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+</div>
+*@
+
+@model BlogIt.Models.Blog
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<div class="col-md-8 offset-md-2 mb-4">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">@Html.DisplayFor(model => model.Title)</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text text-muted" style="text-align:center">
+                <span class="label" style="margin-right: 50px;">@Html.DisplayFor(model => model.BlogCategory.Name)</span>
+                <span class="label" style="margin-right: 50px;">@Html.DisplayFor(model => model.User.UserName)</span>
+                <span class="label" style="margin-right: 50px;">@Html.DisplayFor(model => model.Date)</span>
+            </p>
+            <hr/>
+            <p class="card-text">@Html.Raw(Model.content)</p>
+            <div class="text-right">
+                <a href="@Url.Action("Edit", "Blogs", new { id = Model.Id })" class="btn btn-primary">Edit</a>
+            </div>
+        </div>
+    </div>
 </div>
