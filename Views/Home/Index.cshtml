@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@*@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @if (SignInManager.IsSignedIn(User))
@@ -43,5 +43,72 @@ else
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+}*@
+@using Microsoft.AspNetCore.Identity
+@using BlogIt.Models
+@using BlogIt.Controllers
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@if (SignInManager.IsSignedIn(User))
+{
+
+    @model IEnumerable<BlogIt.Models.Blog>
+<style>
+        .label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .card-header img {
+            object-fit: cover;
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                var userProfile = ViewBag.UserProfiles[item.UserId];
+                //var user = await UserManager.FindByIdAsync(item.UserId);
+                //var userProfile = await db._context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == item.UserId);
+                <div class="col-md-8 offset-md-2 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center">
+                                @if (!string.IsNullOrEmpty(userProfile.ProfilePic))
+                                {
+                                    <img src="@userProfile.ProfilePic" class="rounded-circle mr-2" width="50" height="50">
+                                }
+                                <h5 class="mb-0">@item.User.UserName</h5>
+                                 @if(item.UserId!=ViewBag.thisUserId)
+                                 {
+                                     <a asp-action="Edit"  style="text-decoration:none">Follow</a>
+                                 }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">
+                                <span class="label"></span>@Html.DisplayFor(modelItem => item.BlogCategory.Name)
+                                <span class="label"></span>@Html.DisplayFor(modelItem => item.Date)
+                            </p>
+                            <hr />
+                            <h3 class="text-center">@Html.DisplayFor(modelItem => item.Title)</h3>
+                            <p class="card-text">@Html.Raw(item.content)</p>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    ViewData["Title"] = "Home Page";
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
 
 }

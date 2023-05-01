@@ -152,7 +152,15 @@
                     <a href="@Model.Youtube"><img class="YouTube" style="height:40px;width:40px" src="/images/YouTube.png"></a>
                 }
                 <div class="profile-footer">
-                    <a asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" style="text-decoration:none">Edit Profile</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" style="text-decoration:none">Followers</a>
+                </div>
+                <div class="col">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" style="text-decoration:none">Following</a>
                 </div>
             </div>
         </div>
