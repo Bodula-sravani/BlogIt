@@ -82,13 +82,14 @@ namespace BlogIt.Controllers
                 userProfile.Email = userProfile.User.Email;
                 
                 // To display the latest 2 posts of that user in his profile page
-                ViewBag.BlogListTop2 = _context.Blogs
+                var BlogListTop2 = _context.Blogs
                                                 .Include(b => b.BlogCategory)
                                                 .Include(b => b.User)
                                                 .Where(b => b.User.Id == currentUserId)
                                                 .OrderByDescending(b => b.Date)
-                                                .Take(2);
+                                                .Take(2).ToList();
 
+                ViewBag.BlogListTop2 = BlogListTop2.Count==0 ? null: BlogListTop2;
                 return View(userProfile);
             }
             

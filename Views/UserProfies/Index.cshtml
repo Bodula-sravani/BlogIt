@@ -1,5 +1,5 @@
 ﻿@model BlogIt.Models.UserProfie
-
+@using System.Linq
 <!DOCTYPE html>
 <html>
 <head>
@@ -108,7 +108,7 @@
     <div style="text-align: right;" class="mb-2">
         <div style="float: right;">
             <div>
-                <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">Posts</a>
+                <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">Blogs</a>
 
             </div>
         </div>
@@ -136,7 +136,7 @@
                 }
                 @if (!string.IsNullOrEmpty(Model.Instagram))
                 {
-                    <a href="@Model.Instagram"><img class="instagram" style="height:40px;width:40px" src="/images/insta.jpg"></a>
+                    <a href="@Model.Instagram"><img class="instagram" style="height:40px;width:40px" src="/images/instagram.jpg"></a>
                 }
                 @if (!string.IsNullOrEmpty(Model.Youtube))
                 {
@@ -147,7 +147,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col">
+                <div class="col" style="margin-left:60px">
                     <a asp-action="Followers" asp-controller="Followers" style="text-decoration:none">Followers</a>
                 </div>
                 <div class="col">
@@ -157,6 +157,18 @@
         </div>
         <div class="blogs col">
             <div class="row">
+                @if (ViewBag.BlogListTop2 == null)
+                {
+                    <div class="col-md-8 offset-md-2 mb-4">
+                        <div class="card" style="width: 600px; height: 300px;">
+                            <div class="card-header">
+                                <p style="text-align:center"><i>....No Blogs posted....</i></p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
                 @foreach (var item in ViewBag.BlogListTop2)
                 {
                     <a href="@Url.Action("Details", "Blogs", new { id = item.Id })" style="text-decoration: none; color: inherit;">
@@ -178,9 +190,10 @@
                     </a>
                     
                 }
+                }
             </div>
         </div>
-
+        
        </div>
         
     </body>
