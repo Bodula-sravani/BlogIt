@@ -10,6 +10,7 @@ using BlogIt.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
+using System.Reflection.Metadata;
 
 namespace BlogIt.Controllers
 {
@@ -17,14 +18,12 @@ namespace BlogIt.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> userManager;
-        // private readonly RoleManager<IdentityRole> roleManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserProfiesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)//, RoleManager<IdentityRole> roleManager)
+        public UserProfiesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
-            //this.roleManager = roleManager;
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -32,9 +31,9 @@ namespace BlogIt.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var userId = userManager.GetUserId(this.User);
+            var currentUserId = userManager.GetUserId(this.User);
 
-            var user = await userManager.FindByIdAsync(userId);
+            var currentUser = await userManager.FindByIdAsync(currentUserId);
 
           // Check if the user is logged in as an admin
                 if (User.IsInRole("Admin"))
@@ -78,12 +77,15 @@ namespace BlogIt.Controllers
                 }
             else
             {
-                var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
+                // Getting the current userProfile details
+                var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
                 userProfile.Email = userProfile.User.Email;
+                
+                // To display the latest 2 posts of that user in his profile page
                 ViewBag.BlogListTop2 = _context.Blogs
                                                 .Include(b => b.BlogCategory)
                                                 .Include(b => b.User)
-                                                .Where(b => b.User.Id == userId)
+                                                .Where(b => b.User.Id == currentUserId)
                                                 .OrderByDescending(b => b.Date)
                                                 .Take(2);
 
@@ -112,14 +114,15 @@ namespace BlogIt.Controllers
         }
         public async Task<UserProfie> SetImageAndProfile(UserProfie userProfie, IFormFile ProfilePic)
         {
-            var userId = userManager.GetUserId(this.User);
+            // To store the values in userProfile model save the image in wwwroot/Images folder  - used in edit & create user
+            var currentUserId = userManager.GetUserId(this.User);
 
-            var user = await userManager.FindByIdAsync(userId);
+            var currentUser = await userManager.FindByIdAsync(currentUserId);
 
-            var Email = await userManager.GetEmailAsync(user);
-            //var roles = await userManager.GetRolesAsync(user);
-            userProfie.UserId = userId;
-            userProfie.Email = Email;
+            var currentUserEmail = await userManager.GetEmailAsync(currentUser);
+
+            userProfie.UserId = currentUserId;
+            userProfie.Email = currentUserEmail;
             if (ProfilePic != null && ProfilePic.Length > 0)
             {
                 // Generate a unique filename for the profile picture
@@ -152,17 +155,20 @@ namespace BlogIt.Controllers
             }
             return userProfie;
         }
+
+
         // GET: UserProfies/Create
         public async Task<IActionResult> Create()
         {
-            var userId = userManager.GetUserId(this.User);
-           var user = await userManager.FindByIdAsync(userId);
-            ////   var roles = await userManager.GetRolesAsync(user);
-            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
+            // Intinally comes to create profile page if user profile is already created goes to index pages
+            var currentUserId = userManager.GetUserId(this.User);
+            var currentUser = await userManager.FindByIdAsync(currentUserId);
+            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
 
             if (userProfile == null)
             {
-                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+                // ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+                ViewBag.UserId = currentUserId;
                 return View();
             }
             else
@@ -178,10 +184,11 @@ namespace BlogIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Email,Description,Interests,ProfilePic,UserId,Facebook,Twitter,Instagram,Youtube")] UserProfie userProfie, IFormFile ProfilePic)
         {
+            // Sets all fields values of the profile and saves the profile pic 
             userProfie = (UserProfie)SetImageAndProfile(userProfie, ProfilePic);
             _context.Add(userProfie);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: UserProfies/Edit/5
@@ -191,19 +198,18 @@ namespace BlogIt.Controllers
             {
                 return NotFound();
             }
-            var userId = userManager.GetUserId(this.User);
+            var currentUserId = userManager.GetUserId(this.User);
 
-            var user = await userManager.FindByIdAsync(userId);
+            var currentUser = await userManager.FindByIdAsync(currentUserId);
 
-            //   var roles = await userManager.GetRolesAsync(user);
-
-            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == userId);
+            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
             if (userProfile == null)
             {
                 return NotFound();
             }
             userProfile.Email = userProfile.User.Email;
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId); ;
+            //ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId); ;
+            ViewBag.UserId = currentUserId;
             return View(userProfile);
         }
 

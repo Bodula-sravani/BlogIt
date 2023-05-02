@@ -24,20 +24,21 @@ namespace BlogIt.Controllers
         // GET: Followers
         public async Task<IActionResult> Followers()
         {
-            var userId = _userManager.GetUserId(this.User);
-            //var user = await _userManager.FindByIdAsync(userId);
-            var applicationDbContext = _context.Followers.Include(f => f.User).Where(f=>f.UserId == userId);
+            // TO get followers of current user
+            var currentUserId = _userManager.GetUserId(this.User);
+            var applicationDbContext = _context.Followers.Include(f => f.User).Where(f=>f.UserId == currentUserId);
             return View(await applicationDbContext.ToListAsync());
         }
 
         public async Task<IActionResult> Following()
         {
-            
-            var userId = _userManager.GetUserId(this.User);
-            var user = await _userManager.FindByIdAsync(userId);
-            var applicationDbContext = _context.Followers.Include(f => f.User).Where(f => f.FollowerId == userId);
-            // Getting names of following users since I am not storing following userID as user foreignKey 
-            // Only Follower userId is refrencing to User as Foreign key
+            // To get the following list of current user
+            var currentUserId = _userManager.GetUserId(this.User);
+            var currentUser = await _userManager.FindByIdAsync(currentUserId);
+            var applicationDbContext = _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId);
+
+            // Getting names of following users since I am not storing followingUserID as user foreignKey 
+            // Only FollowerserId is refrencing to User as Foreign key
             foreach(var item in  await applicationDbContext.ToListAsync())
             {
                 var itemUser = await _userManager.FindByIdAsync(item.UserId);
@@ -70,7 +71,7 @@ namespace BlogIt.Controllers
         }
         public async Task<IActionResult> Index(string userId)
         {
-            // Using index to create a record in table
+            // Using index to create a record in Followers table
             var currentUserId = _userManager.GetUserId(this.User);
             ViewData["FollowerId"] = new SelectList(_context.Users, "Id", "Id");
             var Follower = new Follower();
@@ -84,6 +85,7 @@ namespace BlogIt.Controllers
         // GET: Followers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            // To remove a follower or to unfollow a following user and redirects to profile page
             if (id == null || _context.Followers == null)
             {
                 return NotFound();

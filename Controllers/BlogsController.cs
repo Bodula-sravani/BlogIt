@@ -20,24 +20,23 @@ namespace BlogIt.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> userManager;
-        // private readonly RoleManager<IdentityRole> roleManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public BlogsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
-            //this.roleManager = roleManager;
             _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Blogs
         public async Task<IActionResult> Index()
         {
-            var userId = userManager.GetUserId(this.User);
+            var currentUserId = userManager.GetUserId(this.User);
 
-            var user = await userManager.FindByIdAsync(userId);
-            var applicationDbContext = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==userId).OrderByDescending(b => b.Date);
+            var currentUser = await userManager.FindByIdAsync(currentUserId);
+            // Get all blogs of current user and display it in his page
+            var applicationDbContext = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==currentUserId).OrderByDescending(b => b.Date);
             return View(await applicationDbContext.ToListAsync());
             
         }
@@ -49,7 +48,7 @@ namespace BlogIt.Controllers
             {
                 return NotFound();
             }
-
+  
             var blog = await _context.Blogs
                 .Include(b => b.BlogCategory)
                 .Include(b => b.User)
@@ -95,9 +94,9 @@ namespace BlogIt.Controllers
         // GET: Blogs/Create
         public IActionResult Create()
         {
-            var userId = userManager.GetUserId(this.User);
+            var currentUserId = userManager.GetUserId(this.User);
             ViewData["CategoryNames"] = new SelectList(_context.BlogCategories, "Name", "Name");
-            ViewBag.UserId = userId;
+            ViewBag.UserId = currentUserId;
             return View();
         }
 

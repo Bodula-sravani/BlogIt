@@ -23,16 +23,22 @@ namespace BlogIt.Controllers
         
         public async Task<IActionResult> Index()
         {
+            // To display all posts in home index page
             var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).OrderByDescending(b => b.Date).ToList();
+
+            // To store userProfiles of that blog id, to display userName and user profile pic in blogs
             var userProfileDict = new Dictionary<string, UserProfie>();
             foreach (var blog in blogs)
             {
                 var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
                 userProfileDict[blog.UserId] = (UserProfie)userProfile;
             }
-            var userId = _userManager.GetUserId(this.User);
-            ViewBag.thisUserId = userId;
-            ViewBag.FollowingList =  _context.Followers.Include(f => f.User).Where(f => f.FollowerId == userId).Select(f => f.UserId).ToList();
+
+            var currentUserId = _userManager.GetUserId(this.User);
+
+            //  Storing following list and current userId to Not display follow button on those values
+            ViewBag.thisUserId = currentUserId;
+            ViewBag.FollowingList =  _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId).Select(f => f.UserId).ToList();
             ViewBag.UserProfiles = userProfileDict;
             return View(blogs);
         }
