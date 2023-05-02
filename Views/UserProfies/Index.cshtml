@@ -108,7 +108,7 @@
     <div style="text-align: right;" class="mb-2">
         <div style="float: right;">
             <div>
-                <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">Blogs</a>
+                <a asp-action="Index" asp-controller="Blogs" class="btn btn-primary" style="background-color:indianred">My Blogs</a>
 
             </div>
         </div>
@@ -169,8 +169,10 @@
                 }
                 else
                 {
+                    <h5 style="text-align:center">Latest Blogs</h5>
                 @foreach (var item in ViewBag.BlogListTop2)
                 {
+                    
                     <a href="@Url.Action("Details", "Blogs", new { id = item.Id })" style="text-decoration: none; color: inherit;">
                         <div class="col-md-8 offset-md-2 mb-4">
                             <div class="card" style="width: 600px; height: 300px;">

@@ -17,8 +17,41 @@
             <hr/>
             <p class="card-text">@Html.Raw(Model.content)</p>
             <div class="text-right">
-                <a href="@Url.Action("Edit", "Blogs", new { id = Model.Id })" class="btn btn-primary">Edit</a>
+                <a href="@Url.Action("Edit", "Blogs", new { id = Model.Id })" class="btn btn-primary" style="background-color:indianred">Edit</a> 
+                <a href="@Url.Action("Delete", "Blogs", new { id = Model.Id })" class="btn btn-primary" style="background-color:indianred">Delete</a>
             </div>
         </div>
+        <div class="card-footer">
+            <hr />
+            @{
+                var Comments = ViewBag.Comments[Model.Id];
+            }
+            @if (Comments != null && Comments.Count != 0)
+            {
+                <h4>Comments:</h4>
+                @foreach (var comment in Comments)
+                {
+                    var commenterProfile = ViewBag.UserProfiles[comment.UserId];
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                @if (!string.IsNullOrEmpty(commenterProfile.ProfilePic))
+                                {
+                                    <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="40" height="40">
+                                }
+                                <p class="mb-0"><b>@commenterProfile.Name</b></p>
+                            </div>
+                            <p class="card-text">@comment.Content</p>
+                            <p class="card-text text-muted">@comment.Date.ToString("d MMM yyyy, h:mm tt")</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No comments yet.</p>
+            }
+        </div>
+
     </div>
 </div>

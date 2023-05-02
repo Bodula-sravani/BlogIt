@@ -40,31 +40,35 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <p class="card-text text-muted">
-                                <span class="label"></span>@Html.DisplayFor(modelItem => item.BlogCategory.Name)
-                                <span class="label"></span>@Html.DisplayFor(modelItem => item.Date)
+                            <p class="card-text text-muted" style="text-align:center;color:black">
+                                <span class="label"></span>Category:  @Html.DisplayFor(modelItem => item.BlogCategory.Name)
+                                <span class="label"></span>Date:  @Html.DisplayFor(modelItem => item.Date)
                             </p>
                             <hr />
                             <h3 class="text-center">@Html.DisplayFor(modelItem => item.Title)</h3>
                             <p class="card-text">@Html.Raw(item.content)</p>
 
                         </div>
-                        @*<div class="card-footer">
+                        <div class="card-footer">
                             @if (SignInManager.IsSignedIn(User))
                             {
                                 <form asp-action="CreateComment" asp-controller="Blogs" method="post">
                                     <div class="form-group">
                                         <textarea name="content" class="form-control" placeholder="Write a comment..."></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Post</button>
+                                    <br/>
+                                    <button type="submit" class="btn btn-primary" Style="background-color:indianred">Post</button>
                                     <input type="hidden" name="blogId" value="@item.Id" />
                                 </form>
                             }
                             <hr />
-                            @if (item.Comments.Any())
+                            @{
+                                var Comments = ViewBag.Comments[item.Id];
+                            }
+                            @if (Comments!=null && Comments.Count!=0)
                             {
                                 <h4>Comments:</h4>
-                                @foreach (var comment in item.Comments)
+                                @foreach (var comment in Comments)
                                 {
                                     var commenterProfile = ViewBag.UserProfiles[comment.UserId];
                                     <div class="card mb-3">
@@ -72,9 +76,9 @@
                                             <div class="d-flex align-items-center">
                                                 @if (!string.IsNullOrEmpty(commenterProfile.ProfilePic))
                                                 {
-                                                    <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="50" height="50">
+                                                    <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="40" height="40">
                                                 }
-                                                <h5 class="mb-0">@commenterProfile.Name</h5>
+                                                <p class="mb-0"><b>@commenterProfile.Name</b></p>
                                             </div>
                                             <p class="card-text">@comment.Content</p>
                                             <p class="card-text text-muted">@comment.Date.ToString("d MMM yyyy, h:mm tt")</p>
@@ -86,7 +90,7 @@
                             {
                                 <p>No comments yet.</p>
                             }
-                        </div>*@
+                        </div>
                     </div>
                 </div>
             }

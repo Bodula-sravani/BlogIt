@@ -37,6 +37,29 @@ namespace BlogIt.Controllers
             var currentUser = await userManager.FindByIdAsync(currentUserId);
             // Get all blogs of current user and display it in his page
             var applicationDbContext = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==currentUserId).OrderByDescending(b => b.Date);
+
+            // To store userProfiles of that blog id, to display userName and user profile pic in each comment
+            var userProfileDict = new Dictionary<string, UserProfie>();
+
+            // To store Comments of that blog id, to display userName and user profile pic in blogs
+            var CommentsDict = new Dictionary<string, List<Comment>>();
+            foreach (var blog in applicationDbContext)
+            {
+
+                var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
+
+                CommentsDict[blog.Id] = comments;
+                foreach (var comment in comments)
+                {
+                    var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
+                    userProfileDict[comment.UserId] = (UserProfie)userProfile;
+
+                }
+
+            }
+        
+            ViewBag.UserProfiles = userProfileDict;
+            ViewBag.Comments = CommentsDict;
             return View(await applicationDbContext.ToListAsync());
             
         }
@@ -53,6 +76,21 @@ namespace BlogIt.Controllers
                 .Include(b => b.BlogCategory)
                 .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            // To store Comments of that blog id, to display userName and user profile pic in blogs
+            var CommentsDict = new Dictionary<string, List<Comment>>();
+            var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
+            CommentsDict[blog.Id] = comments;
+
+            // To store userProfiles of that blog id, to display userName and user profile pic in each comment
+            var userProfileDict = new Dictionary<string, UserProfie>();
+            foreach (var comment in comments)
+            {
+                var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
+                userProfileDict[comment.UserId] = (UserProfie)userProfile;
+
+            }
+            ViewBag.UserProfiles = userProfileDict;
+            ViewBag.Comments = CommentsDict;
             if (blog == null)
             {
                 return NotFound();
@@ -210,6 +248,33 @@ namespace BlogIt.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateComment(string blogId,string content)
+        {
+            var blog = await _context.Blogs.FindAsync(blogId);
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var comment = new Comment
+            {
+                BlogId = blogId,
+                UserId = user.Id,
+                Content = content,
+                Date = DateTime.Now
+            };
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index","Home");
+        }
         private bool BlogExists(string id)
         {
           return (_context.Blogs?.Any(e => e.Id == id)).GetValueOrDefault();

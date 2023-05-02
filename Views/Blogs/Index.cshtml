@@ -27,10 +27,10 @@
                         <h3 class="text-center">@Html.DisplayFor(modelItem => item.Title)</h3>
                     </div>
                     <div class="card-body">
-                        <p class="card-text text-muted">
-                            <span class="label"></span>@Html.DisplayFor(modelItem => item.BlogCategory.Name)
-                            <span class="label"></span>@Html.DisplayFor(modelItem => item.User.UserName)
-                            <span class="label"></span>@Html.DisplayFor(modelItem => item.Date)
+                        <p class="card-text text-muted" style="text-align:center;color:black">
+                            <span class="label"></span>Category: @Html.DisplayFor(modelItem => item.BlogCategory.Name)
+                            @*<span class="label"></span>@Html.DisplayFor(modelItem => item.User.UserName)*@
+                            <span class="label"></span>Date: @Html.DisplayFor(modelItem => item.Date)
                         </p>
                         <p class="card-text">@Html.Raw(item.content)</p>
                         
@@ -38,9 +38,38 @@
                     <div class="card-footer">
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Edit</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Delete</a>
+                            <hr />
+                            @{
+                                var Comments = ViewBag.Comments[item.Id];
+                            }
+                            @if (Comments != null && Comments.Count != 0)
+                            {
+                                <h4>Comments:</h4>
+                                @foreach (var comment in Comments)
+                                {
+                                    var commenterProfile = ViewBag.UserProfiles[comment.UserId];
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                @if (!string.IsNullOrEmpty(commenterProfile.ProfilePic))
+                                                {
+                                                    <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="40" height="40">
+                                                }
+                                                <p class="mb-0"><b>@commenterProfile.Name</b></p>
+                                            </div>
+                                            <p class="card-text">@comment.Content</p>
+                                            <p class="card-text text-muted">@comment.Date.ToString("d MMM yyyy, h:mm tt")</p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>No comments yet.</p>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
         }
     </div>
 </div>
