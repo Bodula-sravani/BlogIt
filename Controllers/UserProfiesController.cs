@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using System.Reflection.Metadata;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BlogIt.Controllers
 {
@@ -106,11 +107,44 @@ namespace BlogIt.Controllers
             var userProfie = await _context.UserProfiles
                 .Include(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            // Get all blogs of the user and display it in details page
+            var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b => b.User.Id == userProfie.UserId).OrderByDescending(b => b.Date);
+            ViewBag.UserBlogs = blogs.ToList();
+
+            // To store userProfiles of that blog id, to display userName and user profile pic
+            var userProfileDict = new Dictionary<string, UserProfie>();
+
+            // To store Comments of that blog id 
+            var CommentsDict = new Dictionary<string, List<Comment>>();
+            foreach (var blog in blogs)
+            {
+                var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
+                userProfileDict[blog.UserId] = (UserProfie)userProfile;
+
+                var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
+
+                CommentsDict[blog.Id] = comments;
+                // To display userName and user profile pic  of all users who commented on the blog 
+                foreach (var comment in comments)
+                {
+                    if (!userProfileDict.ContainsKey(comment.UserId))
+                    {
+                        userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
+                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                    }
+                }
+            }
             if (userProfie == null)
             {
                 return NotFound();
             }
 
+            var currentUserId = userManager.GetUserId(this.User);
+            ViewBag.UserProfiles = userProfileDict;
+            ViewBag.Comments = CommentsDict;
+            //  Storing following list and current userId to Not display follow button on those values
+            ViewBag.currentUserId = currentUserId;
+            ViewBag.FollowingList = _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId).Select(f => f.UserId).ToList();
             return View(userProfie);
         }
         public async Task<UserProfie> SetImageAndProfile(UserProfie userProfie, IFormFile ProfilePic)

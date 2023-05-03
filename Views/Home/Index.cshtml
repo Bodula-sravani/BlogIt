@@ -56,10 +56,19 @@
                                 {
                                     <img src="@userProfile.ProfilePic" class="rounded-circle mr-2" width="50" height="50">
                                 }
-                                <a href="@Url.Action("Details", "UserProfies", new { id = userProfile.Id })" style="text-decoration: none; color: inherit;">
-                                    <h5 class="mb-0">@userProfile.Name</h5>
-                                </a>
-                                 @if(item.UserId!=ViewBag.thisUserId && ( ViewBag.FollowingList == null || !ViewBag.FollowingList.Contains(item.UserId)))
+                                @if (item.UserId != ViewBag.currentUserId)
+                                {
+                                    <a href="@Url.Action("Details", "UserProfies", new { id = userProfile.Id})" style="text-decoration: none; color: inherit;">
+                                        <h5 class="mb-0">@userProfile.Name</h5>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Index", "UserProfies")" style="text-decoration: none; color: inherit;">
+                                        <h5 class="mb-0">@userProfile.Name</h5>
+                                    </a>
+                                }
+                                @if(item.UserId!=ViewBag.currentUserId && ( ViewBag.FollowingList == null || !ViewBag.FollowingList.Contains(item.UserId)))
                                  {
                                     <a asp-action="Index" asp-controller="Followers" asp-route-userId="@item.UserId" style="text-decoration:none">Follow</a>
                                  }

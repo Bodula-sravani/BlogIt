@@ -62,7 +62,7 @@
     <style>
         /* Style for the main container */
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             box-sizing: border-box;
@@ -85,7 +85,7 @@
             margin-bottom: 10px;
         }
         /* Style for the profile description */
-        .profile-desc {
+        .profile-desc, .profile-email {
             font-size: 20px;
             text-align: center;
             margin-bottom: 20px;
@@ -152,8 +152,10 @@
     <div style="text-align: right;" class="mb-2">
         <div style="float: right;">
             <div>
-
-                <a asp-action="Index" asp-controller="Followers" asp-route-userId="@Model.UserId" style="text-decoration:none">Follow</a>
+                @if (Model.UserId != ViewBag.currentUserId && (ViewBag.FollowingList == null || !ViewBag.FollowingList.Contains(Model.UserId)))
+                {
+                    <a asp-action="Index" asp-controller="Followers" asp-route-userId="@Model.UserId" style="text-decoration:none">Follow</a>
+                }
             </div>
         </div>
     </div>
@@ -163,6 +165,7 @@
 
         <!-- Profile name and description -->
         <h1 class="profile-name">@Model.Name</h1> 
+        <p class="profile-email">@Model.Email</p>
         <p class="profile-desc">@Model.Interests</p>
         <div class="profile-desc">
             <p>@Model.Description</p>
@@ -184,6 +187,63 @@
             @if (!string.IsNullOrEmpty(Model.Youtube))
             {
                 <a href="@Model.Youtube"><img class="YouTube" style="height:40px;width:40px" src="/images/YouTube.png"></a>
+            }
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="text-center">Blog List</h1>
+        <hr />
+        <div class="row">
+            @foreach (var item in ViewBag.UserBlogs)
+            {
+                <div class="col-md-8 offset-md-2 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="text-center">@item.Title</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted" style="text-align:center;color:black">
+                                <span class="label"></span>Category: @item.BlogCategory.Name
+                                @*<span class="label"></span>@Html.DisplayFor(modelItem => item.User.UserName)*@
+                                <span class="label"></span>Date: @item.Date
+                            </p>
+                            <p class="card-text">@Html.Raw(item.content)</p>
+
+                        </div>
+                        <div class="card-footer">
+
+                            <hr />
+                            @{
+                                var Comments = ViewBag.Comments[item.Id];
+                            }
+                            @if (Comments != null && Comments.Count != 0)
+                            {
+                                <h4>Comments:</h4>
+                                @foreach (var comment in Comments)
+                                {
+                                    var commenterProfile = ViewBag.UserProfiles[comment.UserId];
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                @if (!string.IsNullOrEmpty(commenterProfile.ProfilePic))
+                                                {
+                                                    <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="40" height="40">
+                                                }
+                                                <p class="mb-0"><b>@commenterProfile.Name</b></p>
+                                            </div>
+                                            <p class="card-text">@comment.Content</p>
+                                            <p class="card-text text-muted">@comment.Date.ToString("d MMM yyyy, h:mm tt")</p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p>No comments yet.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
             }
         </div>
     </div>

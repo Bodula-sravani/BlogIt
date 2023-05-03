@@ -55,7 +55,7 @@ namespace BlogIt.Controllers
             var currentUserId = _userManager.GetUserId(this.User);
 
             //  Storing following list and current userId to Not display follow button on those values
-            ViewBag.thisUserId = currentUserId;
+            ViewBag.currentUserId = currentUserId;
             ViewBag.FollowingList =  _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId).Select(f => f.UserId).ToList();
             ViewBag.UserProfiles = userProfileDict;
             ViewBag.Comments = CommentsDict;
