@@ -1,4 +1,4 @@
-﻿@model BlogIt.Models.UserProfie
+﻿@*@model BlogIt.Models.UserProfie
 
 @{
     ViewData["Title"] = "Details";
@@ -52,3 +52,142 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+*@
+@model BlogIt.Models.UserProfie
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blogger Profile</title>
+    <style>
+        /* Style for the main container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        /* Style for the profile picture */
+        .profile-pic {
+            display: block;
+            margin: 0 auto 20px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        /* Style for the profile name */
+        .profile-name {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        /* Style for the profile description */
+        .profile-desc {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        /* Style for the social media icons */
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+            .social-icons a {
+                display: inline-block;
+                width: 40px;
+                height: 40px;
+                margin: 0 10px;
+                border-radius: 50%;
+                background-color: #ccc;
+                color: #fff;
+                text-align: center;
+                line-height: 40px;
+                transition: background-color 0.3s ease;
+            }
+
+                .social-icons a:hover {
+                    background-color: #666;
+                }
+        /* Style for the blog posts */
+        .blog-posts {
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+            .blog-posts h2 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .blog-posts p {
+                font-size: 16px;
+                line-height: 1.5;
+                margin-bottom: 20px;
+            }
+
+            .blog-posts a {
+                font-size: 16px;
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+
+                .blog-posts a:hover {
+                    color: #666;
+                }
+
+        img.facebook {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: right;" class="mb-2">
+        <div style="float: right;">
+            <div>
+
+                <a asp-action="Index" asp-controller="Followers" asp-route-userId="@Model.UserId" style="text-decoration:none">Follow</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Profile picture -->
+        <img class="profile-pic" style="height:100px;width:100px" src="@Model.ProfilePic" alt="Profile picture" />
+
+        <!-- Profile name and description -->
+        <h1 class="profile-name">@Model.Name</h1> 
+        <p class="profile-desc">@Model.Interests</p>
+        <div class="profile-desc">
+            <p>@Model.Description</p>
+        </div>
+        <!-- Social media icons -->
+        <div class="social-icons">
+            @if (!string.IsNullOrEmpty(Model.Facebook))
+            {
+                <a href="@Model.Facebook"><img class="facebook" style="height:40px;width:40px" src="/images/facebook.jpg"></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Twitter))
+            {
+                <a href="@Model.Twitter"><img class="Twitter" style="height:40px;width:40px" src="/images/Twitter.png"></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Instagram))
+            {
+                <a href="@Model.Instagram"><img class="instagram" style="height:40px;width:40px" src="/images/instagram.jpg"></a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Youtube))
+            {
+                <a href="@Model.Youtube"><img class="YouTube" style="height:40px;width:40px" src="/images/YouTube.png"></a>
+            }
+        </div>
+    </div>
+</body>
+</html>
+
+

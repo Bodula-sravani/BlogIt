@@ -38,7 +38,7 @@
         }
 
         /* Style for the profile description */
-        .profile-desc {
+        .profile-desc, .profile-email {
             font-size: 20px;
             text-align: center;
             margin-bottom: 20px;
@@ -120,10 +120,12 @@
 
             <!-- Profile name and description -->
             <h1 class="profile-name">@Model.Name</h1>
+            <p class="profile-email">@Model.Email</p>
             <p class="profile-desc">@Model.Interests</p>
             <div class="profile-desc">
                 <p>@Model.Description</p>
             </div>
+         
             <!-- Social media icons -->
             <div class="social-icons">
                 @if (!string.IsNullOrEmpty(Model.Facebook))

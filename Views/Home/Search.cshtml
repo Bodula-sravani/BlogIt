@@ -15,7 +15,12 @@
     }
 </style>
 
-
+@if(Model==null || !Model.Any())
+{
+    <p><i>....No Blogs Found</i></p>
+}
+else
+{
 <div class="container">
     <div class="row">
         @foreach (var item in Model)
@@ -95,3 +100,4 @@
         }
     </div>
 </div>
+}

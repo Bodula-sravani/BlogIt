@@ -21,6 +21,7 @@ namespace BlogIt.Controllers
             _userManager = userManager;
         }
 
+
         
         public async Task<IActionResult> Index()
         {
@@ -46,7 +47,7 @@ namespace BlogIt.Controllers
                     if(!userProfileDict.ContainsKey(comment.UserId))
                     {
                         userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                        userProfileDict[blog.UserId] = (UserProfie)userProfile;
+                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
                     }
                 }
             }
@@ -71,11 +72,11 @@ namespace BlogIt.Controllers
             {
                 if (searchType == "blogTitle")
                 {
-                    blogs = blogs.Where(b => b.Title.Contains(searchString)).ToList();
+                    blogs = blogs.Where(b => b.Title.ToLower().Contains(searchString.ToLower())).ToList();
                 }
                 else if (searchType == "blogCategory")
                 {
-                    blogs = blogs.Where(b => b.BlogCategory.Name.Contains(searchString)).ToList();
+                    blogs = blogs.Where(b => b.BlogCategory.Name.ToLower().Contains(searchString.ToLower())).ToList();
                 }
             }
             // To store userProfiles of that blog id, to display userName and user profile pic
@@ -97,7 +98,7 @@ namespace BlogIt.Controllers
                     if (!userProfileDict.ContainsKey(comment.UserId))
                     {
                         userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                        userProfileDict[blog.UserId] = (UserProfie)userProfile;
+                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
                     }
                 }
             }
