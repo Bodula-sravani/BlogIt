@@ -10,14 +10,18 @@
     }
 
 </style>
-
 <div>
     <a asp-action="Create" class="btn btn-primary" style="background-color:indianred" class="carousel-control-prev-icon">Upload new Blog</a>
 </div>
+@if(Model==null || !Model.Any())
+{
+    <p><i>....No Blogs....</i></p>
+}
+else
+{
 <div class="container">
     <h1 class="text-center">Blog List</h1>
     <hr />
-
     <div class="row">
         @foreach (var item in Model)
         {
@@ -73,3 +77,4 @@
         }
     </div>
 </div>
+}

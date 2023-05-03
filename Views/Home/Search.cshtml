@@ -1,0 +1,97 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using BlogIt.Models
+@using BlogIt.Controllers
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@model IEnumerable<BlogIt.Models.Blog>
+<style>
+    .label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .card-header img {
+        object-fit: cover;
+    }
+</style>
+
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var userProfile = ViewBag.UserProfiles[item.UserId];
+            //var user = await UserManager.FindByIdAsync(item.UserId);
+            //var userProfile = await db._context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == item.UserId);
+            <div class="col-md-8 offset-md-2 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            @if (!string.IsNullOrEmpty(userProfile.ProfilePic))
+                            {
+                                <img src="@userProfile.ProfilePic" class="rounded-circle mr-2" width="50" height="50">
+                            }
+                            <h5 class="mb-0">@userProfile.Name</h5>
+                            @if (item.UserId != ViewBag.thisUserId && (ViewBag.FollowingList == null || !ViewBag.FollowingList.Contains(item.UserId)))
+                            {
+                                <a asp-action="Index" asp-controller="Followers" asp-route-userId="@item.UserId" style="text-decoration:none">Follow</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted" style="text-align:center;color:black">
+                            <span class="label"></span>Category:  @Html.DisplayFor(modelItem => item.BlogCategory.Name)
+                            <span class="label"></span>Date:  @Html.DisplayFor(modelItem => item.Date)
+                        </p>
+                        <hr />
+                        <h3 class="text-center">@Html.DisplayFor(modelItem => item.Title)</h3>
+                        <p class="card-text">@Html.Raw(item.content)</p>
+
+                    </div>
+                    <div class="card-footer">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <form asp-action="CreateComment" asp-controller="Blogs" method="post">
+                                <div class="form-group">
+                                    <textarea name="content" class="form-control" placeholder="Write a comment..."></textarea>
+                                </div>
+                                <br />
+                                <button type="submit" class="btn btn-primary" Style="background-color:indianred">Post</button>
+                                <input type="hidden" name="blogId" value="@item.Id" />
+                            </form>
+                        }
+                        <hr />
+                        @{
+                            var Comments = ViewBag.Comments[item.Id];
+                        }
+                        @if (Comments != null && Comments.Count != 0)
+                        {
+                            <h4>Comments:</h4>
+                            @foreach (var comment in Comments)
+                            {
+                                var commenterProfile = ViewBag.UserProfiles[comment.UserId];
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(commenterProfile.ProfilePic))
+                                            {
+                                                <img src="@commenterProfile.ProfilePic" class="rounded-circle mr-2" width="40" height="40">
+                                            }
+                                            <p class="mb-0"><b>@commenterProfile.Name</b></p>
+                                        </div>
+                                        <p class="card-text">@comment.Content</p>
+                                        <p class="card-text text-muted">@comment.Date.ToString("d MMM yyyy, h:mm tt")</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>No comments yet.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

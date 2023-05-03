@@ -169,10 +169,9 @@
                 }
                 else
                 {
-                    <h5 style="text-align:center">Latest Blogs</h5>
+                    <h5 class="text-center" style="-ms-text-underline-position:50px">Latest Blogs</h5>
                 @foreach (var item in ViewBag.BlogListTop2)
                 {
-                    
                     <a href="@Url.Action("Details", "Blogs", new { id = item.Id })" style="text-decoration: none; color: inherit;">
                         <div class="col-md-8 offset-md-2 mb-4">
                             <div class="card" style="width: 600px; height: 300px;">
@@ -181,8 +180,8 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="card-text text-muted">
-                                        <span class="label"></span>@item.BlogCategory.Name
-                                        <span class="label"></span>@item.Date
+                                        <span class="label"></span>Category: @item.BlogCategory.Name
+                                        <span class="label"></span>Date: @item.Date
                                     </p>
                                     <p class="card-text">@Html.Raw(item.content.Substring(0, 100))</p>
 

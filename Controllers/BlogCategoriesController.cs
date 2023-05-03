@@ -21,6 +21,7 @@ namespace BlogIt.Controllers
             _context = context;
         }
 
+
         // GET: api/BlogCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogCategory>>> GetBlogCategories()

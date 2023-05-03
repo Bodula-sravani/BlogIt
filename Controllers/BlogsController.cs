@@ -35,6 +35,7 @@ namespace BlogIt.Controllers
             var currentUserId = userManager.GetUserId(this.User);
 
             var currentUser = await userManager.FindByIdAsync(currentUserId);
+
             // Get all blogs of current user and display it in his page
             var applicationDbContext = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==currentUserId).OrderByDescending(b => b.Date);
 
@@ -129,6 +130,8 @@ namespace BlogIt.Controllers
         //        blog.content = EditorContent;
         //        return blog;
         //    }
+
+
         // GET: Blogs/Create
         public IActionResult Create()
         {
