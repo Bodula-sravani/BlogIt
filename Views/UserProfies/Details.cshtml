@@ -211,7 +211,15 @@
 
                         </div>
                         <div class="card-footer">
-
+                                <form asp-action="CreateComment" asp-controller="Blogs" method="post">
+                                    <div class="form-group">
+                                        <textarea name="content" class="form-control" placeholder="Write a comment..."></textarea>
+                                    </div>
+                                    <br />
+                                    <button type="submit" class="btn btn-primary" Style="background-color:indianred">Post</button>
+                                    <input type="hidden" name="blogId" value="@item.Id" />
+                                </form>
+                            <hr />
                             <hr />
                             @{
                                 var Comments = ViewBag.Comments[item.Id];
