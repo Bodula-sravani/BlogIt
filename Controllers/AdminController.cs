@@ -198,6 +198,31 @@ namespace BlogIt.Controllers
         }
 
 
-        
+        public async Task<IActionResult> Users()
+        {
+            var users = _userManager.Users.ToList();
+            var admin = users.Find(u => u.UserName.Contains("Admin")==true);
+            users.Remove(admin);
+            return View(users);
+        }
+
+        public async Task<IActionResult> ViewActivity(string Id)
+        {
+            var user = _userManager.FindByIdAsync(Id).Result;
+            var blogPostedDates = _context.Blogs.Include(b => b.User)
+                                    .Where(b => b.User.Id == Id)
+                                    .Select(b => b.Date)
+                                    .OrderByDescending(b => b.Date).ToList();
+
+            var commentedDates = _context.Comments.Include(b => b.User)
+                                    .Where(b => b.User.Id == Id)
+                                    .Select(b => b.Date)
+                                    .OrderByDescending(b => b.Date).ToList();
+
+            ViewBag.blogPostedDates = blogPostedDates;
+            ViewBag.commentedDates = commentedDates;
+            //ViewBag.User = user.UserName;
+            return View(user);
+        }
     }
 }

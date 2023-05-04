@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityUser>
+
+<h1>Users</h1>
+<style>
+    .body
+    {
+        color:indianred
+    }
+</style>
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td style="padding-right:30px">@user.UserName</td>
+                <td><a asp-action="ViewActivity" asp-route-id="@user.Id">View Activity</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
