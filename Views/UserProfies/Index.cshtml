@@ -171,7 +171,7 @@
                 }
                 else
                 {
-                    <h5 class="text-center" style="-ms-text-underline-position:50px">Latest Blogs</h5>
+                    <h5 class="text-center" style="-ms-text-underline-position:50px;padding-left:200px">Latest Blogs</h5>
                 @foreach (var item in ViewBag.BlogListTop2)
                 {
                     <a href="@Url.Action("Details", "Blogs", new { id = item.Id })" style="text-decoration: none; color: inherit;">

@@ -1,4 +1,4 @@
-﻿@model BlogIt.Models.BlogCategory
+﻿@*@model BlogIt.Models.BlogCategory
 
 @{
     ViewData["Title"] = "Edit";
@@ -31,4 +31,44 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+*@
+
+@model BlogIt.Models.BlogCategory
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<div style="margin-top: 20px;">
+    <a asp-action="Index" class="btn btn-secondary" style="background-color: indianred">Back to List</a>
+</div>
+
+<h1 style="text-align:center">Edit Blog Category</h1>
+
+<hr />
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label" style="color: indianred;"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <br/>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" style="background-color: indianred; border-color: indianred;" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -61,7 +61,7 @@ namespace BlogIt.Controllers
             ViewBag.FollowingList =  _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId).Select(f => f.UserId).ToList();
             ViewBag.UserProfiles = userProfileDict;
             ViewBag.Comments = CommentsDict;
-            ViewData["CategoryNames"] = new SelectList(_context.BlogCategories, "Name", "Name");
+            ViewData["CategoryNames"] = _context.BlogCategories.Select(c=>c.Name).ToList();
             return View(blogs);
         }
 

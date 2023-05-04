@@ -16,38 +16,87 @@
 </style>
 
 
+@*<script>
+    $(function () {
+        $('#searchType').change(function () {
+            if ($('#searchType').val() == 'blogCategory') {
+                $('#category').show();
+            } else {
+                $('#category').hide();
+            }
+        });
+    });
+</script>*@
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    $(function () {
+        // Show/hide the category dropdown based on the selected search type
+        $('#searchType').change(function () {
+            var categories = @Html.Raw(Json.Serialize(ViewBag.CategoryNames));
+            var categorySelect = '<select id="searchString" name="searchString" class="form-control">';
+            categorySelect += '<option value="">--Select Category--</option>';
+
+            //Create the dropdown options
+            categories.forEach(function (category) {
+                categorySelect += '<option value="' + category + '">' + category + '</option>';
+            });
+
+            categorySelect += '</select>';
+            var searchInput = '<input type="text" name="searchString" class="form-control" placeholder="Search...">';
+            if ($(this).val() === 'blogCategory') {                
+               $('#searchString').replaceWith(categorySelect);
+                //$('#searchString').hide();
+                //$('#searchCategory').html(categorySelect).show();
+            } else {                
+                $('#searchString').replaceWith(searchInput);
+               // $('#searchCategory').hide();
+               // $('#searchString').show();
+            }
+        });
+    });
+</script>
+
+
+
 @if (SignInManager.IsSignedIn(User) && !User.IsInRole("Admin"))
 {
 
     @model IEnumerable<BlogIt.Models.Blog>
 
-
-
     <div class="row mb-3">
         <form method="post" asp-action="Search" asp-controller="Home" class="form-inline row">
             <div class="form-group col mb-2">
-                <select name="searchType" class="form-control dropdown-toggle" data-toggle="dropdown">
+                <select id="searchType" name="searchType" class="form-control dropdown-toggle" data-toggle="dropdown">
+                    <option value="Search">--Select SearchType--</option>
                     <option value="blogTitle">Blog Title</option>
                     <option value="blogCategory">Blog Category</option>
                 </select>
             </div>
-            <div class="form-group col mx-sm-3 mb-2">
-                <input type="text" name="searchString" class="form-control" placeholder="Search...">
+           <div class="form-group col mx-sm-3 mb-2">
+                <input type="text" id="searchString" name="searchString" class="form-control">
             </div>
+            @*<div class="form-group col mx-sm-3 mb-2" id="searchCategory">
+                <select name="searchString" id="searchCategory" class="form-control">
+                    @foreach (var category in ViewBag.CategoryNames)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>*@
             <div class="form-group col">
                 <input type="submit" class="btn btn-secondary" value="Search">
             </div>
         </form>
     </div>
-
-
     <div class="container">
         <div class="row">
             @foreach (var item in Model)
             {
                 var userProfile = ViewBag.UserProfiles[item.UserId];
-                //var user = await UserManager.FindByIdAsync(item.UserId);
-                //var userProfile = await db._context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == item.UserId);
                 <div class="col-md-8 offset-md-2 mb-4">
                     <div class="card">
                         <div class="card-header">
@@ -135,16 +184,42 @@
 }
 else if(User.IsInRole("Admin"))
 {
+    
     ViewData["Title"] = "Home Page";
 
-    <div class="text-center">
-        <h1 class="display-4">Welcome Admin</h1>
-        <p>You are currently logged in as Admin </p>
-        <p>You Now Have the privilleges of a Admin </p>
-        <a asp-action="Index" asp-controller="Admin">Click here to manipulate with blog Categories</a>
-        <p>You can View the user Activity</p>
-        <a asp-action="Users" asp-controller="Admin">Click here to View User Activity</a>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="text-center display-4 my-5" style="color:indianred">Welcome Admin!</h1>
+            <div class="card shadow">
+                <div class="card-body">
+                    <p class="card-text mb-5">You are currently logged in as Admin and have the privileges of an Admin. You can now manage blog categories and view user activity.</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">Manage Blog Categories</h5>
+                                    <p class="card-text">Click below to manage blog categories and add, edit or delete them according to your preferences.</p>
+                                    <a href="@Url.Action("Index", "Admin")" class="btn btn-primary" style="background-color:indianred">Manage Categories</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">View User Activity</h5>
+                                    <p class="card-text">Click below to view user activity and see what they have been up to.</p>
+                                        <a href="@Url.Action("Users", "Admin")" class="btn btn-primary" style="background-color:indianred">View User Activity</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
 }
 else

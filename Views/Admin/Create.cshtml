@@ -1,4 +1,4 @@
-﻿@model BlogIt.Models.BlogCategory
+﻿@*@model BlogIt.Models.BlogCategory
 
 @{
     ViewData["Title"] = "Create";
@@ -30,4 +30,40 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}*@
+@model BlogIt.Models.BlogCategory
+
+@{
+    ViewData["Title"] = "Create";
 }
+
+<h1>Create a new category</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Category name:</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" style="background-color:indianred">Create category</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+

@@ -221,7 +221,6 @@ namespace BlogIt.Controllers
 
             ViewBag.blogPostedDates = blogPostedDates;
             ViewBag.commentedDates = commentedDates;
-            //ViewBag.User = user.UserName;
             return View(user);
         }
     }
