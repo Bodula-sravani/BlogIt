@@ -12,9 +12,12 @@ using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using System.Reflection.Metadata;
 using static System.Reflection.Metadata.BlobBuilder;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace BlogIt.Controllers
 {
+    [Authorize(Roles = "User")]
     public class UserProfiesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -36,63 +39,21 @@ namespace BlogIt.Controllers
 
             var currentUser = await userManager.FindByIdAsync(currentUserId);
 
-          // Check if the user is logged in as an admin
-                if (User.IsInRole("Admin"))
-                {
-                    // Create a new HttpClient instance
-                    using (HttpClient client = new HttpClient())
-                    {
-                        client.Timeout = TimeSpan.FromSeconds(30);
-                        // Set the base address of the API endpoint
-                        client.BaseAddress = new Uri("http://localhost:7113/api/BlogCategories");
-
-                    // Call the API endpoint and get the response
-                    //HttpResponseMessage response = client.GetAsync("GetAllCategories").Result;
-                    try
-                    {
-                        // Call the API endpoint and get the response
-                        HttpResponseMessage response = await client.GetAsync("");
-
-                        // Check if the response is successful
-                        if (response.IsSuccessStatusCode)
-                        {
-                            // Read the response content
-                            var content = await response.Content.ReadAsStringAsync();
-                            var categories = JsonConvert.DeserializeObject<List<BlogCategory>>(content);
-
-                            // Do something with the categories data
-                            return View(categories);
-                        }
-                        else
-                        {
-                            // Handle the error response
-                            return View("Error");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle the exception
-                        return View("Error");
-                    }
-                }
-                }
-            else
-            {
-                // Getting the current userProfile details
-                var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
-                userProfile.Email = userProfile.User.Email;
+            // Getting the current userProfile details
+            var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
+            userProfile.Email = userProfile.User.Email;
                 
-                // To display the latest 2 posts of that user in his profile page
-                var BlogListTop2 = _context.Blogs
-                                                .Include(b => b.BlogCategory)
-                                                .Include(b => b.User)
-                                                .Where(b => b.User.Id == currentUserId)
-                                                .OrderByDescending(b => b.Date)
-                                                .Take(2).ToList();
+            // To display the latest 2 posts of that user in his profile page
+            var BlogListTop2 = _context.Blogs
+                                            .Include(b => b.BlogCategory)
+                                            .Include(b => b.User)
+                                            .Where(b => b.User.Id == currentUserId)
+                                            .OrderByDescending(b => b.Date)
+                                            .Take(2).ToList();
 
-                ViewBag.BlogListTop2 = BlogListTop2.Count==0 ? null: BlogListTop2;
-                return View(userProfile);
-            }
+            ViewBag.BlogListTop2 = BlogListTop2.Count==0 ? null: BlogListTop2;
+            return View(userProfile);
+            
             
         }
 
@@ -323,3 +284,43 @@ namespace BlogIt.Controllers
         }
     }
 }
+
+
+
+
+//// Create a new HttpClient instance
+//using (HttpClient client = new HttpClient())
+//{
+//    client.Timeout = TimeSpan.FromSeconds(30);
+//    // Set the base address of the API endpoint
+//    client.BaseAddress = new Uri("http://localhost:7113/api/BlogCategories");
+
+//    // Call the API endpoint and get the response
+//    //HttpResponseMessage response = client.GetAsync("GetAllCategories").Result;
+//    try
+//    {
+//        // Call the API endpoint and get the response
+//        HttpResponseMessage response = await client.GetAsync("");
+
+//        // Check if the response is successful
+//        if (response.IsSuccessStatusCode)
+//        {
+//            // Read the response content
+//            var content = await response.Content.ReadAsStringAsync();
+//            var categories = JsonConvert.DeserializeObject<List<BlogCategory>>(content);
+
+//            // Do something with the categories data
+//            return View(categories);
+//        }
+//        else
+//        {
+//            // Handle the error response
+//            return View("Error");
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        // Handle the exception
+//        return View("Error");
+//    }
+//}

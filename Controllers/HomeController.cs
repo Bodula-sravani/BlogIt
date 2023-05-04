@@ -1,9 +1,11 @@
 ﻿using BlogIt.Data;
 using BlogIt.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Diagnostics;
 
 namespace BlogIt.Controllers
@@ -63,6 +65,7 @@ namespace BlogIt.Controllers
             return View(blogs);
         }
 
+        [Authorize(Roles = "User")]
         [HttpPost]
         public async Task<IActionResult> Search(string searchString, string searchType)
         {

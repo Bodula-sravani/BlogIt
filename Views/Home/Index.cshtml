@@ -16,7 +16,7 @@
 </style>
 
 
-@if (SignInManager.IsSignedIn(User))
+@if (SignInManager.IsSignedIn(User) && !User.IsInRole("Admin"))
 {
 
     @model IEnumerable<BlogIt.Models.Blog>
@@ -133,13 +133,24 @@
         </div>
     </div>
 }
-else
+else if(User.IsInRole("Admin"))
 {
     ViewData["Title"] = "Home Page";
 
     <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <h1 class="display-4">Welcome Admin</h1>
+        <p>You are currently logged in as Admin </p>
+        <p>You Now Have the privilleges of a Admin </p>
+        <a asp-action="Index" asp-controller="Admin">Click here to manipulate with blog Categories</a>
+        <p>You can View the user Activity</p>
     </div>
 
+}
+else
+{
+    <div class="text-center">
+        <h1 style="color:indianred">
+            Welcome to <i>BlogIt</i>
+        </h1>
+    </div>
 }

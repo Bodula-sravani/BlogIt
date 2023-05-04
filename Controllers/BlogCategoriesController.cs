@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BlogIt.Data;
 using BlogIt.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace BlogIt.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class BlogCategoriesController : ControllerBase
@@ -21,7 +24,7 @@ namespace BlogIt.Controllers
             _context = context;
         }
 
-
+        [Authorize(Roles = "Admin")]
         // GET: api/BlogCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogCategory>>> GetBlogCategories()

@@ -11,11 +11,11 @@ using Microsoft.AspNetCore.Html;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
-
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlogIt.Controllers
 {
+    [Authorize(Roles ="User")]
     public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;

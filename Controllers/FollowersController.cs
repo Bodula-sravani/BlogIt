@@ -8,9 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using BlogIt.Data;
 using BlogIt.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace BlogIt.Controllers
 {
+    [Authorize(Roles = "User")]
     public class FollowersController : Controller
     {
         private readonly ApplicationDbContext _context;
