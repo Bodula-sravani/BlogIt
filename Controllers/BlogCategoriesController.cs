@@ -12,7 +12,8 @@ using System.Data;
 
 namespace BlogIt.Controllers
 {
-    
+
+   // [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class BlogCategoriesController : ControllerBase
@@ -24,7 +25,6 @@ namespace BlogIt.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
         // GET: api/BlogCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogCategory>>> GetBlogCategories()

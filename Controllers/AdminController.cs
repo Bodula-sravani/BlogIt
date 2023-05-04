@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace BlogIt.Controllers
 {
@@ -20,11 +21,13 @@ namespace BlogIt.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient client;
-        public AdminController(ApplicationDbContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+        public AdminController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"Admin@gmail.com:Admin@1")));
+            _userManager = userManager;
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"Admin@gmail.com:Admin@1")));
         }
         public List<BlogCategory> GetBlogCategories()
         {
@@ -64,8 +67,7 @@ namespace BlogIt.Controllers
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                var s = JsonConvert.DeserializeObject<BlogCategory>(data);
-                blogCategory = s;
+                blogCategory = JsonConvert.DeserializeObject<BlogCategory>(data);
             }
             if (blogCategory == null)
             {
@@ -88,13 +90,16 @@ namespace BlogIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] BlogCategory blogCategory)
         {
-            if (ModelState.IsValid)
+            HttpResponseMessage response = await client.PostAsJsonAsync("https://localhost:7113/api/BlogCategories", blogCategory);
+
+            if (response.IsSuccessStatusCode)
             {
-                _context.Add(blogCategory);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            return View(blogCategory);
+            else
+            {
+                return View(blogCategory);
+            }
         }
 
         // GET: Admin/Edit/5
@@ -105,7 +110,13 @@ namespace BlogIt.Controllers
                 return NotFound();
             }
 
-            var blogCategory = await _context.BlogCategories.FindAsync(id);
+            HttpResponseMessage response = client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result;
+            BlogCategory blogCategory = null;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                blogCategory = JsonConvert.DeserializeObject<BlogCategory>(data);
+            }
             if (blogCategory == null)
             {
                 return NotFound();
@@ -125,27 +136,21 @@ namespace BlogIt.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // send a PUT request to the API to update the category
+            HttpResponseMessage response = await client.PutAsJsonAsync($"https://localhost:7113/api/BlogCategories/{id}", blogCategory);
+
+            // check if the request was successful
+            if (response.IsSuccessStatusCode)
             {
-                try
-                {
-                    _context.Update(blogCategory);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BlogCategoryExists(blogCategory.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                // redirect to the details page for the updated category
+                return RedirectToAction(nameof(Details), new { id = blogCategory.Id });
             }
-            return View(blogCategory);
+            else
+            {
+                // display an error message
+                ModelState.AddModelError(string.Empty, "Unable to update the blog category. Please try again later.");
+                return View();
+            }
         }
 
         // GET: Admin/Delete/5
@@ -155,9 +160,13 @@ namespace BlogIt.Controllers
             {
                 return NotFound();
             }
-
-            var blogCategory = await _context.BlogCategories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            HttpResponseMessage response = client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result;
+            BlogCategory blogCategory = null;
+            if (response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                blogCategory = JsonConvert.DeserializeObject<BlogCategory>(data);
+            }
             if (blogCategory == null)
             {
                 return NotFound();
@@ -171,23 +180,24 @@ namespace BlogIt.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.BlogCategories == null)
+            HttpResponseMessage response = await client.DeleteAsync($"https://localhost:7113/api/BlogCategories/{id}");
+
+            if (response.IsSuccessStatusCode)
             {
-                return Problem("Entity set 'ApplicationDbContext.BlogCategories'  is null.");
+                return RedirectToAction("Index");
             }
-            var blogCategory = await _context.BlogCategories.FindAsync(id);
-            if (blogCategory != null)
+            else
             {
-                _context.BlogCategories.Remove(blogCategory);
+                return NotFound();
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool BlogCategoryExists(int id)
         {
           return (_context.BlogCategories?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+        
     }
 }
