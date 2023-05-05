@@ -53,25 +53,6 @@ namespace BlogIt.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-
-        // GET: Followers/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Followers == null)
-            {
-                return NotFound();
-            }
-
-            var follower = await _context.Followers
-                .Include(f => f.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (follower == null)
-            {
-                return NotFound();
-            }
-
-            return View(follower);
-        }
         public async Task<IActionResult> Index(string userId)
         {
             // Using index to create a record in Followers table

@@ -37,6 +37,7 @@ namespace BlogIt.Controllers
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
+                if (data != null)
                 blogsCategories = JsonConvert.DeserializeObject<List<BlogCategory>>(data);
             }
             return blogsCategories;
@@ -192,15 +193,16 @@ namespace BlogIt.Controllers
         }
 
 
-        public async Task<IActionResult> Users()
+        public IActionResult Users()
         {
             var users = _userManager.Users.ToList();
+            // Remove admin from users list
             var admin = users.Find(u => u.UserName.Contains("Admin")==true);
             users.Remove(admin);
             return View(users);
         }
 
-        public async Task<IActionResult> ViewActivity(string Id)
+        public IActionResult ViewActivity(string Id)
         {
             var user = _userManager.FindByIdAsync(Id).Result;
             var blogPostedDates = _context.Blogs.Include(b => b.User)

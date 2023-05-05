@@ -68,6 +68,12 @@ namespace BlogIt.Controllers
             var userProfie = await _context.UserProfiles
                 .Include(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            if (userProfie == null)
+            {
+                return NotFound();
+            }
+
+
             // Get all blogs of the user and display it in details page
             var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b => b.User.Id == userProfie.UserId).OrderByDescending(b => b.Date);
             ViewBag.UserBlogs = blogs.ToList();
@@ -95,10 +101,6 @@ namespace BlogIt.Controllers
                     }
                 }
             }
-            if (userProfie == null)
-            {
-                return NotFound();
-            }
 
             var currentUserId = userManager.GetUserId(this.User);
             ViewBag.UserProfiles = userProfileDict;
@@ -108,6 +110,8 @@ namespace BlogIt.Controllers
             ViewBag.FollowingList = _context.Followers.Include(f => f.User).Where(f => f.FollowerId == currentUserId).Select(f => f.UserId).ToList();
             return View(userProfie);
         }
+
+
         public async Task<UserProfie> SetImageAndProfile(UserProfie userProfie, IFormFile ProfilePic)
         {
             // To store the values in userProfile model save the image in wwwroot/Images folder  - used in edit & create user
@@ -164,7 +168,6 @@ namespace BlogIt.Controllers
 
             if (userProfile == null)
             {
-                // ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
                 ViewBag.UserId = currentUserId;
                 return View();
             }
@@ -247,44 +250,6 @@ namespace BlogIt.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: UserProfies/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null || _context.UserProfiles == null)
-            {
-                return NotFound();
-            }
-
-            var userProfie = await _context.UserProfiles
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (userProfie == null)
-            {
-                return NotFound();
-            }
-
-            return View(userProfie);
-        }
-
-        // POST: UserProfies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            if (_context.UserProfiles == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.UserProfiles'  is null.");
-            }
-            var userProfie = await _context.UserProfiles.FindAsync(id);
-            if (userProfie != null)
-            {
-                _context.UserProfiles.Remove(userProfie);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
         private bool UserProfieExists(string id)
         {
           return (_context.UserProfiles?.Any(e => e.Id == id)).GetValueOrDefault();
@@ -293,41 +258,3 @@ namespace BlogIt.Controllers
 }
 
 
-
-
-//// Create a new HttpClient instance
-//using (HttpClient client = new HttpClient())
-//{
-//    client.Timeout = TimeSpan.FromSeconds(30);
-//    // Set the base address of the API endpoint
-//    client.BaseAddress = new Uri("http://localhost:7113/api/BlogCategories");
-
-//    // Call the API endpoint and get the response
-//    //HttpResponseMessage response = client.GetAsync("GetAllCategories").Result;
-//    try
-//    {
-//        // Call the API endpoint and get the response
-//        HttpResponseMessage response = await client.GetAsync("");
-
-//        // Check if the response is successful
-//        if (response.IsSuccessStatusCode)
-//        {
-//            // Read the response content
-//            var content = await response.Content.ReadAsStringAsync();
-//            var categories = JsonConvert.DeserializeObject<List<BlogCategory>>(content);
-
-//            // Do something with the categories data
-//            return View(categories);
-//        }
-//        else
-//        {
-//            // Handle the error response
-//            return View("Error");
-//        }
-//    }
-//    catch (Exception ex)
-//    {
-//        // Handle the exception
-//        return View("Error");
-//    }
-//}

@@ -34,6 +34,30 @@ namespace BlogIt.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        public async Task GetData(List<Blog> blogs, Dictionary<string, UserProfie> userProfileDict, Dictionary<string, List<Comment>> CommentsDict)
+        {
+            // Gives userProfiles of each blog using blog id, to display userName and user profile pic
+            // Gives Comments available on  each blog using blogid
+            foreach (var blog in blogs)
+            {
+                var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
+                if (userProfile != null) userProfileDict[blog.UserId] = (UserProfie)userProfile;
+
+                var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
+
+                CommentsDict[blog.Id] = comments;
+                // To display userName and user profile pic of all users who commented on the blog 
+                foreach (var comment in comments)
+                {
+                    if (!userProfileDict.ContainsKey(comment.UserId))
+                    {
+                        userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
+                        if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                    }
+                }
+            }
+        }
+
         // GET: Blogs
         public async Task<IActionResult> Index()
         {
@@ -42,31 +66,19 @@ namespace BlogIt.Controllers
             var currentUser = await userManager.FindByIdAsync(currentUserId);
 
             // Get all blogs of current user and display it in his page
-            var applicationDbContext = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==currentUserId).OrderByDescending(b => b.Date);
+            var blogs = _context.Blogs.Include(b => b.BlogCategory).Include(b => b.User).Where(b=>b.User.Id==currentUserId).OrderByDescending(b => b.Date).ToList();
 
             // To store userProfiles of that blog id, to display userName and user profile pic in each comment
             var userProfileDict = new Dictionary<string, UserProfie>();
 
             // To store Comments of that blog id, to display userName and user profile pic in blogs
             var CommentsDict = new Dictionary<string, List<Comment>>();
-            foreach (var blog in applicationDbContext)
-            {
-
-                var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
-
-                CommentsDict[blog.Id] = comments;
-                foreach (var comment in comments)
-                {
-                    var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                    if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
-
-                }
-
-            }
+            
+            await GetData(blogs, userProfileDict, CommentsDict);
         
             ViewBag.UserProfiles = userProfileDict;
             ViewBag.Comments = CommentsDict;
-            return View(await applicationDbContext.ToListAsync());
+            return View(blogs);
             
         }
 
@@ -82,7 +94,12 @@ namespace BlogIt.Controllers
                 .Include(b => b.BlogCategory)
                 .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            // To store Comments of that blog id, to display userName and user profile pic in blogs
+            if(blog == null)
+            {
+                return NotFound();
+            }
+
+            // To store Comments of that blog id
             var CommentsDict = new Dictionary<string, List<Comment>>();
             var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
             CommentsDict[blog.Id] = comments;
@@ -92,16 +109,10 @@ namespace BlogIt.Controllers
             foreach (var comment in comments)
             {
                 var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                userProfileDict[comment.UserId] = (UserProfie)userProfile;
-
+                if(userProfile!=null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
             }
             ViewBag.UserProfiles = userProfileDict;
             ViewBag.Comments = CommentsDict;
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
             return View(blog);
         }
         public async Task<string> SaveImage(IFormFile Pic)
