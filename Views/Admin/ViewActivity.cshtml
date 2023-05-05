@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@*@using Microsoft.AspNetCore.Identity
 @model IdentityUser
 
 <h3 style="text-align:center;color:indianred">Activity details of @Model.UserName</h3>
@@ -69,4 +69,90 @@
     }
 </div>
 <br />
+<a asp-action="Users" style="color:indianred">Back</a>*@
+
+@{
+    var blogPostedDates = ViewBag.blogPostedDates as List<DateTime>;
+    var commentedDates = ViewBag.commentedDates as List<DateTime>;
+}
+<h3 style="text-align:center;color:indianred">Activity details of @Model.UserName</h3>
+@if (blogPostedDates == null && commentedDates == null)
+{
+    <h5 class="alert-danger" style="text-align:center">User is Inactive</h5>
+}
+else
+{
+    <canvas id="activityChart" width="500" height="100"></canvas>
+    <br/>
+    <h5 style="color:green;text-align:center">User is Active</h5>
+
+}
+<br />
 <a asp-action="Users" style="color:indianred">Back</a>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script>
+        var ctx = document.getElementById("activityChart").getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Posted Blogs",
+                        backgroundColor: "rgba(0, 153, 255, 0.75)",
+                        data: []
+                    },
+                    {
+                        label: "Commented Blogs",
+                        backgroundColor: "rgba(255, 102, 102, 0.75)",
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            step: 1
+                        }
+                    }]
+                }
+            }
+        });
+
+        var blogDates = @Json.Serialize(blogPostedDates);
+        var commentDates = @Json.Serialize(commentedDates);
+
+        var blogData = [];
+        var commentData = [];
+
+        if (blogDates.length > 0) {
+            blogData = getDataArray(blogDates);
+        }
+        if (commentDates.length > 0) {
+            commentData = getDataArray(commentDates);
+        }
+
+        chart.data.labels = chart.data.labels.concat(blogData.labels, commentData.labels);
+        chart.data.datasets[0].data = chart.data.datasets[0].data.concat(blogData.data);
+        chart.data.datasets[1].data = chart.data.datasets[1].data.concat(commentData.data);
+        chart.update();
+
+        function getDataArray(dates) {
+            var labels = dates.map(date => new Date(date).toDateString());
+            var data = dates.map(date => 1);
+            return {
+                labels: labels,
+                data: data
+            };
+        }
+    </script>
+}
+
+
+
+
+
+
