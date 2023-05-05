@@ -38,7 +38,7 @@ namespace BlogIt.Controllers
             foreach (var blog in blogs)
             {
                 var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
-                userProfileDict[blog.UserId] = (UserProfie)userProfile;
+                if (userProfile != null) userProfileDict[blog.UserId] = (UserProfie)userProfile;
 
                 var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
 
@@ -49,7 +49,7 @@ namespace BlogIt.Controllers
                     if(!userProfileDict.ContainsKey(comment.UserId))
                     {
                         userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                        if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace BlogIt.Controllers
             foreach (var blog in blogs)
             {
                 var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
-                userProfileDict[blog.UserId] = (UserProfie)userProfile;
+                if (userProfile != null) userProfileDict[blog.UserId] = (UserProfie)userProfile;
 
                 var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
 
@@ -101,7 +101,7 @@ namespace BlogIt.Controllers
                     if (!userProfileDict.ContainsKey(comment.UserId))
                     {
                         userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                        if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
                     }
                 }
             }

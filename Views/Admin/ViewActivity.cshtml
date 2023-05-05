@@ -1,82 +1,9 @@
-﻿@*@using Microsoft.AspNetCore.Identity
-@model IdentityUser
-
-<h3 style="text-align:center;color:indianred">Activity details of @Model.UserName</h3>
-<hr />
-<div class="row">
-    @if (ViewBag.blogPostedDates == null || ViewBag.blogPostedDates.Count==0)
-    {
-        <p><i>...User has not posted any Blogs...</i></p>
-    }
-    else
-    {
-        <table>
-            <thead>
-                <th>
-                    Posted Dates
-                </th>
-            </thead>
-            <tbody>
-                @foreach (var date in ViewBag.blogPostedDates)
-                {
-                    <tr>
-                        <td>
-                            @date
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-</div>
-<hr />
-<div class="row">
-    @if (ViewBag.commentedDates == null || ViewBag.commentedDates.Count == 0)
-    {
-        <p><i>...User has not Commented on any Blogs...</i></p>
-    }
-    else
-    {
-        <table>
-            <thead>
-            <th>
-                Commented Dates
-            </th>
-            </thead>
-            <tbody>
-                @foreach (var date in ViewBag.commentedDates)
-                {
-                    <tr>
-                        <td>
-                            @date
-                        </td>
-                    </tr>
-                    
-                }
-            </tbody>
-        </table>
-    }
-</div>
-<hr />
-<div class="row">
-    @if (ViewBag.commentedDates.Count == 0 && ViewBag.blogPostedDates.Count == 0)
-    {
-        <h5 class="alert-danger" style="text-align:center">User is Inactive</h5>
-    }
-    else
-    {
-        <h5 style="color:green;text-align:center">User is Active</h5>
-    }
-</div>
-<br />
-<a asp-action="Users" style="color:indianred">Back</a>*@
-
-@{
+﻿@{
     var blogPostedDates = ViewBag.blogPostedDates as List<DateTime>;
     var commentedDates = ViewBag.commentedDates as List<DateTime>;
 }
 <h3 style="text-align:center;color:indianred">Activity details of @Model.UserName</h3>
-@if (blogPostedDates == null && commentedDates == null)
+@if (blogPostedDates.Count == 0 && commentedDates.Count == 0)
 {
     <h5 class="alert-danger" style="text-align:center">User is Inactive</h5>
 }
@@ -153,6 +80,78 @@ else
 
 
 
+@*@using Microsoft.AspNetCore.Identity
+@model IdentityUser
+
+<h3 style="text-align:center;color:indianred">Activity details of @Model.UserName</h3>
+<hr />
+<div class="row">
+    @if (ViewBag.blogPostedDates == null || ViewBag.blogPostedDates.Count==0)
+    {
+        <p><i>...User has not posted any Blogs...</i></p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <th>
+                    Posted Dates
+                </th>
+            </thead>
+            <tbody>
+                @foreach (var date in ViewBag.blogPostedDates)
+                {
+                    <tr>
+                        <td>
+                            @date
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<hr />
+<div class="row">
+    @if (ViewBag.commentedDates == null || ViewBag.commentedDates.Count == 0)
+    {
+        <p><i>...User has not Commented on any Blogs...</i></p>
+    }
+    else
+    {
+        <table>
+            <thead>
+            <th>
+                Commented Dates
+            </th>
+            </thead>
+            <tbody>
+                @foreach (var date in ViewBag.commentedDates)
+                {
+                    <tr>
+                        <td>
+                            @date
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<hr />
+<div class="row">
+    @if (ViewBag.commentedDates.Count == 0 && ViewBag.blogPostedDates.Count == 0)
+    {
+        <h5 class="alert-danger" style="text-align:center">User is Inactive</h5>
+    }
+    else
+    {
+        <h5 style="color:green;text-align:center">User is Active</h5>
+    }
+</div>
+<br />
+<a asp-action="Users" style="color:indianred">Back</a>*@
 
 
 

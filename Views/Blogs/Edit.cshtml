@@ -4,10 +4,18 @@
     ViewData["Title"] = "Edit";
 }
 <link href="~/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="~/js/froala_editor.pkgd.min.js">
-      $('textarea#editor').froalaEditor({
-      imageUploadURL: 'https://localhost:7113'
+<script type="text/javascript" src="~/js/froala_editor.pkgd.min.js"></script>
+
+<script>
+
+$(document).ready(function() {
+    $('#myEditor').froalaEditor({
+        imageUploadURL: '@Url.Action("SaveImage", "Blogs")',
+        imageUploadParams: {
+            id: 'my_editor'
+        }
     });
+});
 </script>
 
 <style>
@@ -50,7 +58,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="row">
@@ -72,6 +80,11 @@
                 <input asp-for="content" class="form-control" />
                 <span asp-validation-for="content" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label for="Pic" class="control-label">Blog Picture:</label>
+                <input type="file" id="Pic" name="Pic" accept="image/*" value="" class="form-control-file" />
+            </div>
+            <br/>
             <div class="form-group container-fluid mb-4" style="width: 1000.77px; height: 160.89px;">
                 <textarea name="EditorContent" id="myEditor">@Html.Raw(ViewBag.content)</textarea>
                 <script>

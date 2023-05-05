@@ -12,6 +12,11 @@ using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using HtmlAgilityPack;
+using System.Reflection.Metadata;
+using System.IO;
+using System.Web;
+using System.Data;
 
 namespace BlogIt.Controllers
 {
@@ -53,7 +58,7 @@ namespace BlogIt.Controllers
                 foreach (var comment in comments)
                 {
                     var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                    userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                    if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
 
                 }
 
@@ -99,39 +104,43 @@ namespace BlogIt.Controllers
 
             return View(blog);
         }
-        //public Blog SetImageInBlog(Blog blog, string CategoryName, string EditorContent)
-        //{
-        //    //To get the src url and store it in the local directory
-        //    string imgSrc = "";
-        //    string htmlString = EditorContent;
-        //    int startIndex = htmlString.IndexOf("<img"); // find the start index of img tag
-        //    if (startIndex >= 0) // if img tag exists
-        //    {
-        //        int endIndex = htmlString.IndexOf(">", startIndex); // find the end index of img tag
-        //        if (endIndex >= 0)
-        //        {
-        //            string imgTag = htmlString.Substring(startIndex, endIndex - startIndex + 1); // extract the img tag
-        //            int srcIndex = imgTag.IndexOf("src=\""); // find the start index of src attribute
-        //            if (srcIndex >= 0)
-        //            {
-        //                int srcEndIndex = imgTag.IndexOf("\"", srcIndex + 5); // find the end index of src attribute
-        //                if (srcEndIndex >= 0)
-        //                {
-        //                    imgSrc = imgTag.Substring(srcIndex + 5, srcEndIndex - srcIndex - 5); // extract the image URL
-        //                    string destinationFilePath = SaveImage(imgSrc).Result;
-        //                    EditorContent.Replace(imgSrc, destinationFilePath);
-        //                }
-        //            }
-        //        }
-        //    }
+        public async Task<string> SaveImage(IFormFile Pic)
+        {
+            string ImgPath = "";
 
-        //    blog.Date = DateTime.Now;
-        //        blog.CategoryId = _context.BlogCategories.Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
-        //        blog.content = EditorContent;
-        //        return blog;
-        //    }
+            if (Pic != null && Pic.Length > 0)
+            {
+                // Generate a unique filename for the profile picture
+                string fileName = Path.GetFileName(Pic.FileName);
+                //string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+                string uniqueFileName = fileName;
+                // Get the web root path
+                string webRootPath = _webHostEnvironment.WebRootPath;
 
+                // Combine the web root path and the "images" folder to get the full path to the destination folder
+                string destinationFolderPath = Path.Combine(webRootPath, "images");
 
+                // If the destination folder doesn't exist, create it
+                if (!Directory.Exists(destinationFolderPath))
+                {
+                    Directory.CreateDirectory(destinationFolderPath);
+                }
+
+                // Combine the destination folder path and the unique filename to get the full path to the destination file
+                string destinationFilePath = Path.Combine(destinationFolderPath, uniqueFileName);
+
+                // Save the file to the destination path
+                using (var stream = new FileStream(destinationFilePath, FileMode.Create))
+                {
+                    await Pic.CopyToAsync(stream);
+                }
+
+                // Update the user profile object with the URL of the saved image
+                ImgPath = $"<img src=\"/images/{uniqueFileName}\" alt=\"Picture\" style=\"display: block; margin: 0 auto;\"/>";
+
+            }
+            return ImgPath;
+        }
         // GET: Blogs/Create
         public IActionResult Create()
         {
@@ -146,15 +155,22 @@ namespace BlogIt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent)
+        public async Task<IActionResult> Create([Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent, IFormFile Pic)
         {
-            blog.Date = DateTime.Now;
-            blog.CategoryId = _context.BlogCategories .Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
-            blog.content= EditorContent;
-            blog.UserId= userManager.GetUserId(this.User);
-            _context.Add(blog);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                blog.Date = DateTime.Now;
+                blog.CategoryId = _context.BlogCategories.Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
+                blog.content = SaveImage(Pic).Result + EditorContent;
+                blog.UserId = userManager.GetUserId(this.User);
+                _context.Add(blog);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch(DBConcurrencyException)
+            {
+                return NotFound();
+            }
         }
 
         // GET: Blogs/Edit/5
@@ -182,7 +198,7 @@ namespace BlogIt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,content,Date,UserId,CategoryId")] Blog blog,string CategoryName,string EditorContent, IFormFile Pic)
         {
             if (id != blog.Id)
             {
@@ -191,9 +207,10 @@ namespace BlogIt.Controllers
 
             try
             {
+                
                 blog.Date = DateTime.Now;
                 blog.CategoryId = _context.BlogCategories.Where(c => c.Name == CategoryName).Select(c => c.Id).FirstOrDefault();
-                blog.content = EditorContent;
+                blog.content = SaveImage(Pic).Result + EditorContent;
                 blog.UserId = userManager.GetUserId(this.User);
                 _context.Update(blog);
                 await _context.SaveChangesAsync();

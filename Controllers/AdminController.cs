@@ -31,26 +31,20 @@ namespace BlogIt.Controllers
         }
         public List<BlogCategory> GetBlogCategories()
         {
-            List<BlogCategory> ads = new List<BlogCategory>();
+            List<BlogCategory> blogsCategories = new List<BlogCategory>();
             HttpResponseMessage response = client.GetAsync("https://localhost:7113/api/BlogCategories").Result;
 
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                var s = JsonConvert.DeserializeObject<List<BlogCategory>>(data);
-                if (s != null)
-                {
-                    ads = s;
-                }
-
-                //Console.WriteLine("=============" + s);
+                blogsCategories = JsonConvert.DeserializeObject<List<BlogCategory>>(data);
             }
-            return ads;
+            return blogsCategories;
         }
         // GET: Admin
         public async Task<IActionResult> Index()
         {
-              return _context.BlogCategories != null ? 
+              return GetBlogCategories() != null ? 
                           View(GetBlogCategories()) :
                           Problem("Entity set 'ApplicationDbContext.BlogCategories'  is null.");
         }
@@ -58,11 +52,11 @@ namespace BlogIt.Controllers
         // GET: Admin/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.BlogCategories == null)
+            if (id == null || client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result == null)
             {
                 return NotFound();
             }
-            HttpResponseMessage response = client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result;
+            HttpResponseMessage response =  client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result;
             BlogCategory blogCategory = null;
             if (response.IsSuccessStatusCode)
             {
@@ -105,7 +99,7 @@ namespace BlogIt.Controllers
         // GET: Admin/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.BlogCategories == null)
+            if (id == null || client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result == null)
             {
                 return NotFound();
             }
@@ -156,7 +150,7 @@ namespace BlogIt.Controllers
         // GET: Admin/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.BlogCategories == null)
+            if (id == null || client.GetAsync($"https://localhost:7113/api/BlogCategories/{id}").Result == null)
             {
                 return NotFound();
             }

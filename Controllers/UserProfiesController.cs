@@ -41,7 +41,7 @@ namespace BlogIt.Controllers
 
             // Getting the current userProfile details
             var userProfile = _context.UserProfiles.Include(u => u.User).FirstOrDefault(u => u.UserId == currentUserId);
-            userProfile.Email = userProfile.User.Email;
+            if(userProfile!=null) userProfile.Email = userProfile.User.Email;
                 
             // To display the latest 2 posts of that user in his profile page
             var BlogListTop2 = _context.Blogs
@@ -80,7 +80,7 @@ namespace BlogIt.Controllers
             foreach (var blog in blogs)
             {
                 var userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == blog.UserId);
-                userProfileDict[blog.UserId] = (UserProfie)userProfile;
+                if (userProfile != null)  userProfileDict[blog.UserId] = (UserProfie)userProfile;
 
                 var comments = await _context.Comments.Where(c => c.BlogId == blog.Id).ToListAsync();
 
@@ -91,7 +91,7 @@ namespace BlogIt.Controllers
                     if (!userProfileDict.ContainsKey(comment.UserId))
                     {
                         userProfile = await _context.UserProfiles.FirstOrDefaultAsync(x => x.UserId == comment.UserId);
-                        userProfileDict[comment.UserId] = (UserProfie)userProfile;
+                        if (userProfile != null) userProfileDict[comment.UserId] = (UserProfie)userProfile;
                     }
                 }
             }
@@ -123,7 +123,8 @@ namespace BlogIt.Controllers
             {
                 // Generate a unique filename for the profile picture
                 string fileName = Path.GetFileName(ProfilePic.FileName);
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+                // string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+                string uniqueFileName = fileName;
 
                 // Get the web root path
                 string webRootPath = _webHostEnvironment.WebRootPath;
@@ -206,6 +207,7 @@ namespace BlogIt.Controllers
             userProfile.Email = userProfile.User.Email;
             //ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId); ;
             ViewBag.UserId = currentUserId;
+            ViewBag.lastPic = userProfile.ProfilePic;
             return View(userProfile);
         }
 
@@ -214,7 +216,7 @@ namespace BlogIt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Email,Description,Interests,ProfilePic,UserId,Facebook,Twitter,Instagram,Youtube")] UserProfie userProfile, IFormFile ProfilePic)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Email,Description,Interests,ProfilePic,UserId,Facebook,Twitter,Instagram,Youtube")] UserProfie userProfile, string lastPic, IFormFile ProfilePic)
         {
             if (id != userProfile.Id)
             {
@@ -222,7 +224,12 @@ namespace BlogIt.Controllers
             }
             try
             {
+
                 userProfile = (UserProfie)SetImageAndProfile(userProfile, ProfilePic);
+                if(userProfile.ProfilePic==null)
+                {
+                    userProfile.ProfilePic = lastPic;
+                }
                 _context.Update(userProfile);
                 await _context.SaveChangesAsync();
             }

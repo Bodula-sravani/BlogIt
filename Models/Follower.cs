@@ -7,12 +7,11 @@ namespace BlogIt.Models
     public class Follower
     {
         [Key]
-
         public int Id { get; set; }
         public string UserId { get; set; }
 
         [ForeignKey("User")]
-        public string FollowerId { get; set; }     // The one who follows userId
+        public string FollowerId { get; set; }               // The one who follows userId
         public IdentityUser User { get; set; }
  
     }
